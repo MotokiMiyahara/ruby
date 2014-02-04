@@ -1,0 +1,29 @@
+---
+pixiv.net:
+  /:
+    !binary "UEhQU0VTU0lE": !ruby/object:Mechanize::Cookie
+      name: !binary |-
+        UEhQU0VTU0lE
+      value: 1651168_1681ee5d3f4d5ba5c78060a835727803
+      domain: pixiv.net
+      for_domain: true
+      path: /
+      secure: false
+      httponly: false
+      expires: Fri, 16 Aug 2013 16:07:25 GMT
+      max_age: 
+      created_at: 2013-07-18 01:07:25.906250000 +09:00
+      accessed_at: 2013-07-18 01:07:25.984375000 +09:00
+    !binary "cF9hYl9pZA==": !ruby/object:Mechanize::Cookie
+      name: !binary |-
+        cF9hYl9pZA==
+      value: '4'
+      domain: pixiv.net
+      for_domain: true
+      path: /
+      secure: false
+      httponly: false
+      expires: Tue, 17 Jul 2018 16:07:24 GMT
+      max_age: 
+      created_at: 2013-07-18 01:07:25.828125000 +09:00
+      accessed_at: 2013-07-18 01:07:25.984375000 +09:00

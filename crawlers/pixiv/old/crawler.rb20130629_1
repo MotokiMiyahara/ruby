@@ -1,0 +1,201 @@
+# vim:set fileencoding=utf-8:
+
+require_relative '../uri_getter'
+require_relative '../thread_pool'
+require 'mtk/firefox'
+require 'pp'
+
+class String
+  # ヒアドキュメントのインデント対応用
+  def ~
+    margin = scan(/^ +/).map(&:size).min
+    gsub(/^ {#{margin}}/, '')
+  end
+end
+
+module Pixiv
+  class Crawler
+    def initialize pool, keyword, opts = {}
+      @pool = pool
+
+      @keyword = keyword
+      @s_mode = keyword.split(/\s|　/).size == 1 ? 's_tag_full' : 's_tag'
+      @is_r18 = opts[:r18]
+      @min_page = opts[:min_page] || 1
+      @max_page = opts[:max_page] || 1
+
+      @cookie = Mtk::FIREFOX.cookie['pixiv.net']
+
+      dir_prefix = @is_r18 ? "r18_" : ""
+      #@dest_dir = "C:/Documents and Settings/mtk/My Documents/generated_data/pixiv/#{fix_basename(dir_prefix + @keyword)}"
+      @dest_dir = "H:/generated_data/crawler/pixiv/#{fix_basename(dir_prefix + @keyword)}"
+      Dir.mkdir(@dest_dir) unless File.exist? @dest_dir
+    end
+
+    def crawl
+      (@min_page .. @max_page).each do |page|
+        crawl_index page
+      end
+    rescue OutOfIndexError => e
+      puts e.message
+    end
+
+    def crawl_index page
+      puts "page=#{page}"
+
+      base_uri = index_uri page
+      html = get_html_as_utf8_with_firefox(base_uri)
+
+      # もう画像がない
+      if html =~ %r{<div class="_no-item">見つかりませんでした</div>}
+        raise OutOfIndexError, "Reach end of index page: page=#{page} keyword=#{@keyword}"
+      end
+
+      # 子のページを探す
+      pattern = ~<<-'EOS'
+        <li class="image-item"><a href="([^"]+)" class="work">
+      EOS
+      pattern.gsub!(/\n/, '')
+      pattern = Regexp.new pattern
+
+      html.scan(pattern) do |s|
+        path = s [0]
+        child_uri = join_uri base_uri, path
+        crawl_child(child_uri)
+      end
+    end
+
+
+    private
+    def index_uri page
+      h = {
+        s_mode: @s_mode,
+        r18: @is_r18 ? 1 : 0,
+        order: :date_d,
+        p: page,
+        word: @keyword
+      }
+      query = URI.encode_www_form h
+      return"http://www.pixiv.net/search.php?#{query}"
+    end
+
+    def join_uri first, *args
+      result = URI.parse(first)
+      args.each do |path|
+        result = result.merge(path)
+      end
+      return result.to_s
+    end
+
+    def crawl_child base_uri
+      html = get_html_as_utf8_with_firefox base_uri
+      pattern = ~<<-'EOS'
+        <div class="works_display"><a href="([^"]+)" target="_blank">
+      EOS
+      pattern.gsub!(/\n/, '')
+      pattern = Regexp.new pattern
+
+      html.scan(pattern) do |s|
+        path = s [0]
+        works_uri = join_uri base_uri, path 
+        crawl_works(works_uri, base_uri)
+      end
+    end
+
+    def crawl_works base_uri, referer
+      base_uri.gsub!('&amp;', '&')
+      if base_uri =~ /mode=big/
+        crawl_big base_uri, referer
+      elsif base_uri =~ /mode=manga/
+        crawl_manga base_uri, referer
+      else
+        raise "unknown pattern: #{base_uri}"
+      end
+    end
+
+    def crawl_big base_uri, referer
+      html = get_html_as_utf8_with_firefox base_uri, 'Referer' => referer
+      pattern = %r{<body><img src="([^"]+)"}
+      open('b.txt', 'w')do |f|
+        f.write html
+      end
+
+
+      html.scan(pattern) do |s|
+        path = s [0]
+        #p base_uri, path
+        image_uri = join_uri base_uri, path 
+        #p image_uri 
+        download_image image_uri, base_uri
+      end
+    end
+
+    def crawl_manga base_uri, referer
+      html = get_html_as_utf8_with_firefox base_uri, 'Referer' => referer
+      pattern = %r{data-filter="manga-image" data-src="([^"]+)"}
+      html.scan(pattern) do |s|
+        path = s [0]
+        #p base_uri, path
+        image_uri = join_uri base_uri, path 
+        download_image image_uri, base_uri
+      end
+    end
+
+    def download_image *args
+#p 'dow: ' + args.to_s
+      @pool.push_task do
+        begin
+          do_download_image *args
+        rescue => e
+          puts e
+          pp e.backtrace
+        end
+      end
+    end
+
+    def do_download_image uri, referer
+      file = calc_image_path uri
+      return if File.exist? file
+      
+p uri 
+      binary = get_binary_with_firefox uri, 'Referer' => referer
+      open(file, 'wb')do |f|
+        f.write binary
+      end
+    end
+
+
+    def calc_image_path url
+      basename = fix_basename(url.gsub(/\?.*/, '').split('/')[-1])
+      #basename = url.gsub(/\?.*/, '').split('/')[-1]
+      file = File.join(@dest_dir, basename)
+      return file
+    end
+
+
+    def get_html_as_utf8_with_firefox uri, *args
+      options = {"Cookie" => @cookie}
+      opts = args[-1].is_a?(Hash) ? args.pop : {}
+      options.merge! opts
+      text = UriGetter.get_html_as_utf8(uri, *args, options)
+    end
+
+    def get_binary_with_firefox uri, *args
+      options = {"Cookie" => @cookie}
+      opts = args[-1].is_a?(Hash) ? args.pop : {}
+      options.merge! opts
+      text = UriGetter.get_binary(uri, *args, options)
+    end
+    # ファイル名に使えない文字を取り除く
+    def fix_basename basename
+      result = basename.dup
+      result.gsub!(%r{[\\/:*?"<>|]}, '')
+      result.gsub!(/\s|　/, '_')
+      return result
+    end
+  end
+
+  class OutOfIndexError < StandardError; end
+end
+
+

@@ -1,0 +1,192 @@
+
+require 'uri'
+require 'net/http'
+require './clipboard'
+
+
+class MyDownloader
+  USER_AGENT_FIREFOX = "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0"
+  DEST_DIR = "./dest/"
+
+  private_class_method :new
+
+  private
+  def initialize
+    #@threads = []
+    @pile = Workpile.new(100)
+  end
+
+  public
+  def self.open *args, &block
+    m = new
+    m.__send__(:do_and_join, *args, &block)
+  end
+
+  def download_from_clipborad  
+    text = ClipBoard.get_text
+    lines = text.split(/\r?\n/).map{|line| line.strip}
+    urls = lines.find_all{|line| is_uri line}
+    download_from_thread_urls urls
+  end
+
+  def download_from_thread_urls urls
+    urls.each do |url|
+      #with_thread do
+        download_from_thread_url url
+      #end
+    end
+  end
+  
+  def download_from_thread_url url
+    text = get(url)
+    download_from_text text
+  end
+
+  private
+  def download_from_text text
+    urls = extract_image_urls text
+    #urls.each {|e| p e}
+    download_from_urls urls
+  end
+
+  def extract_image_urls text
+    lines = text.scan %r{h?ttp://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
+    return lines.map{|line| "http://" + line[0]}
+  end
+
+
+  def download_from_urls urls
+    urls.each do |url|
+      image = calc_image_path url
+      next if File.exists?(image)
+
+      with_thread do
+        download_from_url url
+      end
+    end
+  end
+  
+
+  def download_from_url url
+puts url
+    image = calc_image_path url
+    body = get(url)
+    write_image(image, body)
+  end
+
+  def get(url)
+    uri = URI(url)
+    http = Net::HTTP.new(uri.host, uri.port) 
+    response = http.get(
+      uri.path,
+      "user-agent" => USER_AGENT_FIREFOX
+    ) 
+    return response.body
+  end
+
+  def calc_image_path url
+    image = url.split('/')[-1]
+    file = File.join(DEST_DIR, image)
+    return file
+  end
+
+  def write_image file, body
+    open(file, "wb") do |f|
+      f.write(body)
+    end
+  end
+
+  def do_and_join 
+    yield self
+  ensure
+    @pile.end_task
+    @pile.join
+  end
+
+  def with_thread *args, &block
+    @pile.push_task *args, &block
+  end
+
+  def is_uri str
+    uri = URI(str)
+    return  uri.is_a?(URI::HTTP)  ||
+            uri.is_a?(URI::HTTPS) ||
+            uri.is_a?(URI::FTP) 
+
+  rescue URI::Error => e
+    puts e.message
+    return false
+  end
+
+end
+
+
+
+# ---------------------
+require 'thread'
+require 'thwait'
+class Workpile
+  def initialize(num_workers)
+    @queue = Queue.new
+    @workers = []
+    @max_workers_count = num_workers
+
+    @mutex = Mutex.new
+    @is_terminating = false # guarded by @mutex
+  end
+
+  def add_worker_thread_if_needs
+    return if @workers.size >= @max_workers_count
+
+    @workers << th = Thread.new do
+      until @mutex.synchronize {@is_terminating}
+        f = @queue.pop
+        if f.nil?
+          @mutex.synchronize {
+            @is_terminating = true
+          }
+        else
+          f.call # work
+        end
+      end
+    end
+  end
+
+  def push_task(&block)
+    @mutex.synchronize {
+      return if @is_terminating
+    }
+    add_worker_thread_if_needs
+    @queue.push block
+  end
+
+  def end_task
+    @queue.push(nil)
+  end
+
+  def join
+    ThreadsWait.all_waits(*@workers)
+  rescue Exception => e
+    puts e
+  end
+
+end
+
+
+def test  
+  MyDownloader.open do |m|
+    m.download_from_clipborad
+
+    #m.download_from_thread_urls [
+    #  'http://pele.bbspink.com/test/read.cgi/ascii2d/1361714808/',
+    #]
+  end
+end
+
+
+
+if $0 == __FILE__
+  test
+end
+
+

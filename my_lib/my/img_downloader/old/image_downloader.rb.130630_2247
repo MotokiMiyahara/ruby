@@ -1,0 +1,222 @@
+# vim:set fileencoding=utf-8:
+
+require 'uri'
+require 'net/http'
+require 'pathname'
+require 'mtk/net/uri_getter'
+require_relative './clipboard'
+require_relative '../my'
+
+class MyDownloader
+  USER_AGENT_FIREFOX = "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0"
+  DEST_DIR = Pathname.new My::Path.from_program("./dest/")
+
+  private_class_method :new
+
+  private
+  def initialize
+    #@threads = []
+    @pile = Workpile.new(100)
+  end
+
+  public
+  def self.open *args, &block
+    m = new
+    m.__send__(:do_and_join, *args, &block)
+  end
+
+  def download_from_clipborad  
+    text = ClipBoard.get_text
+    return unless text
+    lines = text.split(/\r?\n/).map{|line| line.strip}
+    urls = lines.find_all{|line| is_uri? line}
+    download_from_thread_urls urls
+  end
+
+  def download_from_thread_urls urls
+    urls.each do |url|
+      #with_thread do
+        download_from_thread_url url
+      #end
+    end
+  end
+  
+  def download_from_thread_url url
+    text = UriGetter.get_html_as_utf8(url)
+    download_from_text text
+  end
+
+  private
+  def download_from_text text
+    title = extract_title(text)
+    p title
+    urls = extract_image_urls text
+
+    dir = DEST_DIR.join(fix_basename(title))
+    dir.mkdir unless dir.exist?
+
+    download_from_urls urls, dir
+  end
+
+  def extract_title text 
+    if text =~ %r{<title>([^>]+)</title>}
+      return $1.strip
+    else
+      return "unkown"
+    end
+  end
+
+  def extract_image_urls text
+    lines = text.scan %r{h?ttp://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
+    return lines.map{|line| "http://" + line[0]}
+  end
+
+
+  def download_from_urls urls, dir
+    urls.each do |url|
+      with_thread do
+        download_from_url url, dir
+      end
+    end
+  end
+  
+
+  def download_from_url url, dir
+    image = calc_image_path url, dir
+    return if File.exists?(image)
+
+puts url
+    body = UriGetter.get_binary(url)
+    write_image(image, body)
+  rescue OpenURI::HTTPError, Errno::ECONNRESET => e
+    puts "#{e.message} (#{e.class}) url=#{url}"
+  end
+
+
+  def calc_image_path url, dir
+    image = url.split('/')[-1]
+    return dir.join(image)
+  end
+
+  def write_image file, body
+    open(file, "wb") do |f|
+      f.write(body)
+    end
+  end
+
+  def fix_basename basename
+    result = basename.dup
+    result.gsub!(%r{[\\/:*?"<>|]}, '')
+    result.gsub!(/\s|　/, '_')
+    return result
+  end
+
+  def do_and_join 
+    yield self
+  ensure
+    @pile.end_task
+    @pile.join
+  end
+
+  def with_thread *args, &block
+    @pile.push_task *args, &block
+  end
+
+  def is_uri? str
+    uri = URI(str)
+    return  uri.is_a?(URI::HTTP)  ||
+            uri.is_a?(URI::HTTPS) ||
+            uri.is_a?(URI::FTP) 
+
+  rescue URI::Error => e
+    puts e.message
+    return false
+  end
+
+end
+
+
+
+# ---------------------
+require 'thread'
+require 'thwait'
+require 'sync'
+
+class Workpile
+  def initialize(num_workers)
+    @queue = Queue.new
+    @workers = []
+    @max_workers_count = num_workers
+
+    # Accessed by consumer ---
+    @mutex = Sync.new
+    @is_terminating = false # guarded by @mutex
+
+
+    # Accessd by producer
+    @is_task_end = false # guarded by @mutex
+
+  end
+
+
+  public
+  def push_task(&block)
+    @mutex.synchronize {
+      return if @is_task_end
+      add_worker_thread_if_needs
+    }
+    @queue.push block
+  end
+
+  def end_task
+    @mutex.synchronize {
+      return if @is_task_end
+      @is_task_end = true
+    }
+    @queue.push(nil)
+  end
+
+  def join
+    ThreadsWait.all_waits(*@workers)
+  rescue Exception => e
+    puts "#{e.message} (#{e.class})"
+  end
+
+  private
+  def add_worker_thread_if_needs
+    return if @workers.size >= @max_workers_count
+
+    @workers << th = Thread.new do
+      until @mutex.synchronize {@is_terminating}
+        f = @queue.pop
+        if f.nil?
+          @mutex.synchronize {
+            @is_terminating = true
+          }
+        else
+          f.call # work
+        end
+      end
+    end
+  end
+end
+
+
+def test  
+  Thread.abort_on_exception = true
+  MyDownloader.open do |m|
+    m.download_from_clipborad
+
+    #m.download_from_thread_urls [
+    #  'http://pele.bbspink.com/test/read.cgi/ascii2d/1361714808/',
+    #]
+  end
+end
+
+
+
+if $0 == __FILE__
+  test
+end
+
+

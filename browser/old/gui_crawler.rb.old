@@ -1,0 +1,35 @@
+# vim:set fileencoding=utf-8:
+
+require 'tk'
+require_relative '../crawler/fire'
+require_relative '../crawler/mr_crawler'
+require_relative 'tk_multi'
+
+
+yscr = TkScrollbar.new.pack(fill: 'y', side: 'right').pack
+t = TkText.new.pack
+t.yscrollbar(yscr)
+
+
+
+TkButton.new {
+  text 'Crawl'
+
+  log_proc = lambda{|*args|
+    puts "args=#{args}"
+    t.insert 'end',  args.join("\n") + "\n"
+    t.see 'end'
+    Tk.update
+  }
+
+  command lambda{ 
+    TkMulti.multi do
+      state 'disabled'
+      Crawlers.fire log_proc: log_proc
+      state 'normal'
+    end
+  }
+  pack
+}
+Tk.mainloop
+

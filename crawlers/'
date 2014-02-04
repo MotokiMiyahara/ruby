@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="../commons/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+          $('#target').css('color', 'red')
+          //$('#target').css('background', 'blue')
+          //$('#target').css('background-color', 'green')
+          $('#target').css('backgroundColor', 'yellow')
+      });
+
+</script>
+  </head>
+  <body>
+    <div id="target">
+      ターゲット
+    </div>
+  </body>
+</html>
+<!-- vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et: -->

@@ -1,0 +1,86 @@
+# vim:set fileencoding=utf-8:
+
+###
+require 'open-uri'
+require 'openssl'
+
+module Mtk
+  module Net
+    module UriGetter
+      USER_AGENT_FIREFOX = "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0"
+
+      class <<self
+        public
+        public
+        def get_binary uri, *rest
+          open_uri(uri, "rb", *rest) do |f|
+            return f.read
+          end
+        end
+
+        def get_html_as_utf8(uri, *rest)
+          return open_html_uri(uri, *rest).encode('UTF-8', invalid: :replace, undef: :replace)
+        end
+
+
+        private 
+        # charsetから戻り値のエンコーディングに反映
+        def open_html_uri(uri, *rest)
+          open_uri(uri, *rest) do |data|
+            text = data.read
+            if equals_encoding(Encoding::ISO_8859_1, data.charset) &&
+                enc_str = get_charset_from_html(text)
+              text = text.dup.force_encoding(enc_str)
+            end
+            return text
+          end
+        end
+
+        # デフォルト値を変更したopen
+        #def open_uri(name, mode='r', perm=nil, opts={}, &block)
+        def open_uri(*args, &block)
+          options = {
+            'User-Agent' => USER_AGENT_FIREFOX, 
+            :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE
+          }
+          opts = args[-1].is_a?(Hash) ? args.pop : {}
+          options.merge! opts
+
+          # URLエンコードを行う(日本語対応)
+          uri = args.shift
+          #uri = URI.encode(uri) if uri.is_a? String
+          open(uri, *args, options, &block)
+        end
+
+        # htmlのメタタグからcharsetを取得
+        def get_charset_from_html (text)
+          if text =~ %r{<meta\s+http-equiv\s*=\s*"?Content-Type"?\s+content\s*=\s*"[^">]*charset=([^">]*)">}i || 
+              text =~ %r{<meta\s+content\s*=\s*"[^">]*charset=([^">]*)"[^>]*http-equiv\s*=\s*"?Content-Type"?[^>]*>}i
+            return fix_charset($1)
+          else
+            return nil
+          end
+        end
+
+        # 非公式なcharsetから公式な形式を得ます
+        def fix_charset charset
+          fixed_charset = charset.upcase
+
+          table = {'SHIFT_JIS' => ['X-SJIS']
+          }
+
+          table.each_pair do |formal, informals|
+            return formal if informals.include?(fixed_charset)
+          end
+          return fixed_charset
+        end
+
+        def equals_encoding(encoding, str)
+          encoding.names.include? str.upcase
+        end
+
+      end
+    end
+  end
+end
+

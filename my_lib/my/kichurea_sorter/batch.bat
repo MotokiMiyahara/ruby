@@ -1,0 +1,2 @@
+
+ruby fire.rb

@@ -1,0 +1,87 @@
+# vim:set fileencoding=utf-8:
+
+require 'thread'
+require 'thwait'
+require 'monitor'
+
+module Mtk
+  module Concurrent
+    # Usage
+    # 
+    # pool = ThreadPool.new
+    # pool.add_producer do |p|
+    #   p.push_task do
+    #     # 時間のかかる処理
+    #     hevy_work
+    #   end
+    # end
+    # pool.join
+    #
+    #
+    class ThreadPool
+      def initialize(num_consumers)
+        @monitor = Monitor.new
+        #@queue = Queue.new
+        @queue = SizedQueue.new(50)
+
+        @producers = []
+
+        @consumers = []                       # Guarded by @monitor
+        @max_consumers_count = num_consumers  # Guarded by @monitor 
+      end
+
+
+      public
+      def push_task(&block)
+        raise ArgumentError "block is required." unless block_given?
+        add_worker_thread_if_needs
+        @queue.push block
+      end
+
+      public
+      def add_producer(&block)
+       @producers << Thread.new do
+          block.call(self)
+       end
+      end
+
+      def join
+        join_producers
+        end_task
+        join_consumers
+      end
+
+      private
+      def end_task
+        @queue.push(nil)
+      end
+
+      def join_producers
+        ThreadsWait.all_waits(*@producers)
+      end
+
+      def join_consumers
+        ThreadsWait.all_waits(*@consumers)
+      end
+
+      def add_worker_thread_if_needs
+        @monitor.synchronize {
+          return if  @max_consumers_count <= @consumers.size
+          @consumers << Thread.new do
+            loop {
+                f = @queue.pop
+                if f.nil?
+                  @queue.push(nil)
+                  break
+                else
+                  f.call # work
+                end
+            }
+          end
+        }
+      end
+    end
+  end
+end
+
+ThreadPool = Mtk::Concurrent::ThreadPool
