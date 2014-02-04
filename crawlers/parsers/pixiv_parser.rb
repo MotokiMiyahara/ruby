@@ -58,7 +58,8 @@ class PixivParser
     }
     #parser.on("--dir=VAL"){|v| opt[:dir] = v}
     parser.on("--r18=VAL"){|v| opt[:r18] = (v == "true")}
-    parser.on("--max_page=VAL"){|v| opt[:max_page] = v}
+    parser.on("--min_page=VAL"){|v| opt[:min_page] = v.to_i}
+    parser.on("--max_page=VAL"){|v| opt[:max_page] = v.to_i}
     parser.parse command.split(/\s+/)
     return opt
   end

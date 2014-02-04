@@ -11,8 +11,6 @@
 
   
 :pixiv --type=new --r18=false
-  /features
-    M字開脚
 
 :pixiv --type=renew --r18=false
 #:pixiv --type=append --r18=false
@@ -271,6 +269,7 @@
     いいですとも!
     騎乗位
     M字騎乗位
+    M字開脚
     KENZEN
     大人化
     パンモロ
@@ -287,7 +286,6 @@
     狐娘
     全裸群像
     このあと滅茶苦茶セックスした
-    
 
 
 
