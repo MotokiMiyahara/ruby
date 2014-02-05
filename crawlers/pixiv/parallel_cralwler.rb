@@ -131,20 +131,25 @@ module Pixiv
       child_uris = anchors.map{|anchor| child_uri = join_uri(base_uri, anchor[:href])}
       
       # ネットワーク接続無しでダウンロード済みのファイルを取り除く
-      existing_child_uris, new_child_uris = child_uris.partition{|uri| @search_file_finder.find_by_uri(uri)} 
-      images = get_remote_images(base_uri, new_child_uris)
+      #existing_child_uris, new_child_uris = child_uris.partition{|uri| @search_file_finder.find_by_uri(uri)} 
+      new_child_uris = child_uris.reject{|uri| @search_file_finder.find_by_uri(uri)} 
+      images = fetch_remote_images(base_uri, new_child_uris)
 
       # 実際に接続した結果を利用してダウンロード済みのファイルを取り除く
-      existing_images, new_images,  = images.partition{|img| img.search_file.exist?}
+      new_images = images.reject{|img| img.search_file.exist?}
       download_images(new_images)
 
-      # ページ内にダウンロード済みの画像があれば巡回停止
-      if @news_only
-        unless existing_child_uris.empty?
-          raise CancellError, "Cancell crawling, because found #{@search_file_finder.find_by_uri(existing_child_uris[0])} (news_only)"
-        end
-        raise CancellError, "Cancell crawling, because found #{existing_images[0].search_file} (news_only)" unless existing_images.empty?
+      if @news_only && new_images.empty?
+        raise CancellError, "Cancell crawling, because not found new images in {page: #{page}, keyword: '#{@keyword}'} (news_only)" 
       end
+
+      # ページ内にダウンロード済みの画像があれば巡回停止
+      #if @news_only
+      #  unless existing_child_uris.empty?
+      #    raise CancellError, "Cancell crawling, because found #{@search_file_finder.find_by_uri(existing_child_uris[0])} (news_only)"
+      #  end
+      #  raise CancellError, "Cancell crawling, because found #{existing_images[0].search_file} (news_only)" unless existing_images.empty?
+      #end
 
       # 次のページがなければ巡回を終了
       unless doc.css(%Q{ul.page-list li a}).any?{|a| a[:href] =~ /\bp=#{page+1}\b/}
@@ -152,6 +157,41 @@ module Pixiv
       end
     end
 
+    #def crawl_index page
+    #  #log "index: page=#{page} keyword=#{@keyword}"
+    #  log "index: page=#{page} #{ident_message}"
+    #  base_uri = index_uri(page)
+    #  doc = get_document(base_uri)
+
+    #  # もう画像がない
+    #  if doc.at_css('div._no-item')
+    #    raise OutOfIndexError, "Out of index page: page=#{page} keyword=#{@keyword}"
+    #  end
+
+    #  anchors = doc.css('li.image-item a.work')
+    #  child_uris = anchors.map{|anchor| child_uri = join_uri(base_uri, anchor[:href])}
+    #  
+    #  # ネットワーク接続無しでダウンロード済みのファイルを取り除く
+    #  existing_child_uris, new_child_uris = child_uris.partition{|uri| @search_file_finder.find_by_uri(uri)} 
+    #  images = fetch_remote_images(base_uri, new_child_uris)
+
+    #  # 実際に接続した結果を利用してダウンロード済みのファイルを取り除く
+    #  existing_images, new_images,  = images.partition{|img| img.search_file.exist?}
+    #  download_images(new_images)
+
+    #  # ページ内にダウンロード済みの画像があれば巡回停止
+    #  if @news_only
+    #    unless existing_child_uris.empty?
+    #      raise CancellError, "Cancell crawling, because found #{@search_file_finder.find_by_uri(existing_child_uris[0])} (news_only)"
+    #    end
+    #    raise CancellError, "Cancell crawling, because found #{existing_images[0].search_file} (news_only)" unless existing_images.empty?
+    #  end
+
+    #  # 次のページがなければ巡回を終了
+    #  unless doc.css(%Q{ul.page-list li a}).any?{|a| a[:href] =~ /\bp=#{page+1}\b/}
+    #    raise CancellError, "Reach end of index page: page=#{page} keyword=#{@keyword}"
+    #  end
+    #end
 
     def index_uri(page)
       h = {
@@ -165,7 +205,7 @@ module Pixiv
       return"http://www.pixiv.net/search.php?#{query}"
     end
 
-    def get_remote_images(base_uri, child_uris)
+    def fetch_remote_images(base_uri, child_uris)
       remote_images = Parallel.map(child_uris, in_threads: THREAD_COUNT_GET_IMAGE_URLS) {|child_uri|
         unless child_uri =~ /illust_id=\d+/
           log "skip because illust_id not found: uri=#{child_uri} base=#{base_uri} keyword=#{@keyword}"

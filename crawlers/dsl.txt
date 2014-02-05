@@ -12,8 +12,8 @@
   
 :pixiv --type=new --r18=false
 
-:pixiv --type=renew --r18=false
-#:pixiv --type=append --r18=false
+#:pixiv --type=renew --r18=false
+:pixiv --type=append --r18=false
   /東方Project
     チルノ
     大妖精
@@ -49,8 +49,6 @@
     今泉影狼
     【東方下着シリーズ】
     スカート捲りマイスター
-
-
 
 
   /dog days
