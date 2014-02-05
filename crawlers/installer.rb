@@ -1,4 +1,4 @@
-#!ruby
+#!/usr/bin/env ruby
 # vim:set fileencoding=utf-8:
 # データ保存用のディレクトリを作るだけ
 
