@@ -38,7 +38,8 @@ class PixivParser
       when "append"
         # 追加
         opt[:min_page] = 1
-        opt[:max_page] = 100
+        #opt[:max_page] = 100
+        opt[:max_page] = 200
         opt[:news_only] = true
         opt[:news_save] = true
       when "renew"
