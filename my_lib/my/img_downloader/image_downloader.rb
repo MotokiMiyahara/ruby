@@ -46,7 +46,8 @@ class MyDownloader
   def initialize
     DEST_DIR.mkdir unless DEST_DIR.exist?
 
-    @db = PStore.new(File.expand_path('~/.mtk/crawlers/2ch/ng_list.dat'), true)
+    db_path = File.expand_path('~/.mtk/crawlers/2ch/ng_list.dat')
+    @db = PStore.new(db_path, true)
     @db.transaction do
       @db[:ng_list] ||= Set.new
     end
