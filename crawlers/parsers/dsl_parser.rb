@@ -10,7 +10,8 @@ require_relative '../pixiv/picture'
 class DslParser
   attr_reader :invokers
   def initialize(file=nil)
-    @file = file || __FILE__.to_pathname.dirname.join("../dsl.txt")
+    #@file = file || __FILE__.to_pathname.dirname.join("../dsl.txt")
+    @file = file || Pathname(__FILE__).dirname.join("../dsl.txt")
 
     @yandere_pool = 
       Mtk::Concurrent::ThreadPool.new(
