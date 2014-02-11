@@ -11,6 +11,9 @@ require 'optparse'
 require 'resolv-replace'
 require 'timeout'
 
+require 'pstore'
+require 'set'
+
 require 'mtk/net/uri_getter'
 require 'mtk/concurrent/thread_pool'
 require 'my/config'
@@ -42,6 +45,11 @@ class MyDownloader
   private
   def initialize
     DEST_DIR.mkdir unless DEST_DIR.exist?
+
+    @db = PStore.new(File.expand_path('~/.mtk/crawlers/2ch/ng_list.dat'), true)
+    @db.transaction do
+      @db[:ng_list] ||= Set.new
+    end
   end
 
   public
@@ -104,11 +112,15 @@ class MyDownloader
 
 
   def download_from_urls(urls, dir)
-    Parallel.each(urls, in_threads: THREAD_COUNT_IMAGE_DOWNLOAD) do |url|
+    white_urls = nil
+    @db.transaction do
+      white_urls = urls - @db[:ng_list].to_a
+    end
+
+    Parallel.each(white_urls, in_threads: THREAD_COUNT_IMAGE_DOWNLOAD) do |url|
       download_from_url(url, dir)
     end
   end
-
 
   def download_from_url(url, dir)
     timeout(TIME_OUT) {
@@ -116,6 +128,9 @@ class MyDownloader
     }
   rescue *NETWORK_ERRORS => e
     puts "#{e.message} (#{e.class}) url=#{url}"
+    @db.transaction do
+      @db[:ng_list].add(url)
+    end
   rescue => e
     puts "#{e.message} (#{e.class})"
     pp e.backtrace
