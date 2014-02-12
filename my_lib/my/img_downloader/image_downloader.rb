@@ -158,17 +158,10 @@ class MyDownloader
 
     puts url
     body = UriGetter.get_binary(url)
-    puts "size #{body.size}"
     write_image(image, body)
     FileUtils.touch(image) if File.exists?(image)
     return ImageResponse.new(url, :ok)
   end
-
-  #def add_to_ng_list(url)
-  #  @db.transaction do
-  #    @db[:ng_list].add(url)
-  #  end
-  #end
 
   def calc_image_path url, dir
     image = url.split('/')[-1]
