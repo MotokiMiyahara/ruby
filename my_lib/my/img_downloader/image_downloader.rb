@@ -107,8 +107,11 @@ class MyDownloader
   end
 
   def extract_image_urls text
-    lines = text.scan %r{h?ttp://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
-    return lines.map{|line| "http://" + line[0]}
+    #lines = text.scan %r{h?ttp://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
+    #return lines.map{|line| "http://" + line[0]}
+    lines = text.scan %r{(?<!src=")(?<!src="h)h?ttp(s?)://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
+    urls = lines.map{|line| "http#{line[0]}://#{line[1]}"}
+    return urls
   end
 
 
@@ -118,34 +121,54 @@ class MyDownloader
       white_urls = urls - @db[:ng_list].to_a
     end
 
-    Parallel.each(white_urls, in_threads: THREAD_COUNT_IMAGE_DOWNLOAD) do |url|
+    image_responces = Parallel.map(white_urls, in_threads: THREAD_COUNT_IMAGE_DOWNLOAD) do |url|
       download_from_url(url, dir)
+    end
+
+    ng_list = image_responces.select{|r| r.status == :ng}.map(&:url)
+    @db.transaction do
+      @db[:ng_list] += ng_list
     end
   end
 
   def download_from_url(url, dir)
     timeout(TIME_OUT) {
-      do_download_from_url(url, dir)
+      return do_download_from_url(url, dir)
     }
   rescue *NETWORK_ERRORS => e
     puts "#{e.message} (#{e.class}) url=#{url}"
-    @db.transaction do
-      @db[:ng_list].add(url)
-    end
+    #add_to_ng_list(url)
+    return ImageResponse.new(url, :ng)
   rescue => e
-    puts "#{e.message} (#{e.class})"
-    pp e.backtrace
+    puts "#{e.message} (#{e.class}) url=#{url}"
+    if e.instance_of?(RuntimeError) && e.message =~ /^redirection forbidden:/
+      # add_to_ng_list(url)
+      return ImageResponse.new(url, :ng)
+    else
+      pp e.backtrace
+      return ImageResponse.new(url, :program_error)
+    end
   end
 
   def do_download_from_url(url, dir)
     image = calc_image_path(url, dir)
-    return if File.exists?(image)
+    if File.exists?(image)
+      return ImageResponse.new(url, :exists)
+    end
 
     puts url
     body = UriGetter.get_binary(url)
+    puts "size #{body.size}"
     write_image(image, body)
     FileUtils.touch(image) if File.exists?(image)
+    return ImageResponse.new(url, :ok)
   end
+
+  #def add_to_ng_list(url)
+  #  @db.transaction do
+  #    @db[:ng_list].add(url)
+  #  end
+  #end
 
   def calc_image_path url, dir
     image = url.split('/')[-1]
@@ -199,6 +222,13 @@ def invoke
   end
 end
 
+class ImageResponse
+  attr_reader :url, :status
+  def initialize(url, status)
+    @url = url
+    @status = status # :ok, :ng, :exists, :program_error
+  end
+end
 
 
 if $0 == __FILE__
