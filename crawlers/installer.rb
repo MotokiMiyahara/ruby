@@ -6,6 +6,7 @@ require_relative 'config'
 require_relative 'pixiv/constants'
 require_relative 'moeren/config'
 require_relative 'yande.re/crawler'
+require_relative 'gelbooru/config'
 
 def main
   puts "You want to make dir? [Y/n]  (#{Crawlers::Config.app_dir})"
@@ -19,14 +20,19 @@ def main
     Crawlers::Config.keep_dir,
 
     Pixiv::PIXIV_DIR,
+    Pixiv::ALL_IMAGE_DIR,
     Pixiv::NEWS_DIR,
     Pixiv::SEARCH_DIR,
-    Pixiv::ALL_IMAGE_DIR,
 
     Moeren::Config::DEST_DIR,
     Moeren::Config::NEWS_DIR,
     Yandere::YANDERE_DIR,
     Yandere::NEWS_DIR,
+
+    Gelbooru::SITE_DIR,
+    Gelbooru::ALL_IMAGE_DIR,
+    Gelbooru::NEWS_DIR,
+    Gelbooru::SEARCH_DIR,
   ]
 
   dirs.each do |dir|

@@ -100,9 +100,9 @@ module Mtk
           text = text.force_encoding('ASCII-8BIT')
           if text =~ %r{<meta\s+http-equiv\s*=\s*"?Content-Type"?\s+content\s*=\s*"[^">]*charset=([^">]*)">}in || 
               text =~ %r{<meta\s+content\s*=\s*"[^">]*charset=([^">]*)"[^>]*http-equiv\s*=\s*"?Content-Type"?[^>]*>}in
-              enc_str = fix_charset($1)
+            enc_str = fix_charset($1)
+            text.force_encoding(enc_str)
           end
-          text.force_encoding(enc_str)
         end
 =begin
         # htmlのメタタグからcharsetを取得
