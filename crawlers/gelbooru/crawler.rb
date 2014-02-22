@@ -50,7 +50,8 @@ module Gelbooru
 
     public
     def crawl
-      start_index_uri = "http://gelbooru.com/index.php?page=post&s=list&tags=#{@keyword}"
+      #start_index_uri = "http://gelbooru.com/index.php?page=post&s=list&tags=#{@keyword}"
+      start_index_uri = "http://gelbooru.com/index.php?page=post&s=list&tags=#{URI.encode_www_form_component(@keyword)}"
       crawl_index(start_index_uri, 1)
     rescue CancellError => e
       log e.message
@@ -66,8 +67,16 @@ module Gelbooru
       log "index: page=#{page} #{ident_message}"
 
       doc = get_document(index_uri)
-      thumbnail_uris = doc.css('.thumb img').map{|img| img['src']}
-      remote_images = thumbnail_uris.map{|uri| RemoteImage.new(uri, @dest_dir, @news_save, @firefox)}
+      remote_images = doc.css('.thumb').map{|thumb|
+        img = thumb.at_css('img')
+        thumbnail_uri = img['src']
+
+        anchor = thumb.at_css('a')
+        display_uri = join_uri(index_uri, anchor['href'])
+
+        next RemoteImage.new(thumbnail_uri, display_uri, @dest_dir, @news_save, @firefox)
+      }
+
       remote_images.reject!{|image| image.search_file.exist?}
       Parallel.each(remote_images, in_threads: THREAD_COUNT_DOWNLOAD_IMAGES) {|image| image.download}
 
@@ -114,6 +123,7 @@ if $0 == __FILE__
   tlog('start')
   Gelbooru::Crawler.new(
     'nude_filter',
+    #'null_(nyanpyoun)',
     news_only: true,
   ).crawl
   tlog('end')

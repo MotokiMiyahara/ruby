@@ -1,6 +1,7 @@
 # vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
 require 'uri'
+require 'cgi'
 require 'pathname'
 
 module Gelbooru
@@ -8,11 +9,13 @@ module Gelbooru
     class RemoteImage
       include Crawlers::Util
 
-      PREFIX = 'gelbooru_'
+      PREFIX = 'gelbooru'
 
       attr_reader :search_file
-      def initialize(thumbnail_uri, dest_dir, news_save, fire_fox)
+      def initialize(thumbnail_uri, display_uri, dest_dir, news_save, fire_fox)
         @uri = thumbnail_uri.sub(%r{thumbnails}, 'images').sub(%r{thumbnail_}, '')
+        @id  = CGI.parse(URI(display_uri).query)['id'][0]
+
         @dest_dir = dest_dir
         @news_save = news_save
         @firefox = fire_fox
@@ -44,7 +47,7 @@ module Gelbooru
       def calc_pathname_in_dir(dir)
         uri = URI(@uri)
         basename = uri.path.split('/')[-1]
-        file = dir.join(PREFIX + basename)
+        file = dir.join("#{PREFIX}_#{@id}_#{basename}")
         return file
       end
       private :calc_pathname_in_dir
