@@ -123,6 +123,7 @@ if $0 == __FILE__
   tlog('start')
   Gelbooru::Crawler.new(
     'nude_filter',
+    #'cowgirl_position',
     #'null_(nyanpyoun)',
     news_only: true,
   ).crawl
