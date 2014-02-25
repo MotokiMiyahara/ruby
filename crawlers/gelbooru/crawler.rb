@@ -118,15 +118,56 @@ module Gelbooru
 end
 
 
+def crawl(keyword)
+  Gelbooru::Crawler.new(
+    keyword,
+    news_only: true
+  ).crawl
+end
+
+KEYWORDS = [
+  'nude_filter',
+  'smile nipples pussy -amputee -nude_filter',
+  'cowgirl_position',
+  'girl_on_top -cowgirl_position -reverse_cowgirl_position',
+  'sitting_on_person sex -girl_on_top -cowgirl_position -reverse_cowgirl_position',
+  'happy_sex',
+  #'bust_chart',
+  'lineup -faceless -nude_filter',
+  'bikini_pull',
+
+  # ---
+  'upskirt -pantyshot',
+  'pantyshot -upskirt',
+
+  # 超高解像度 ---
+  'absurdres pussy -nude_filter',
+
+  ## ---
+  'heart-shaped_pupils',
+  'crotchless_panties',
+  'cupless_bra -crotchless_panties',
+
+  ## ---
+  'waitress nipples',
+  'maid nipples',
+  'cheerleader nipples',
+
+  # characters
+  'flandre_scarlet nipples', 
+
+  # user ---
+  'joy_division',
+  'konkitto',
+  'racco',
+  'null_(nyanpyoun)',
+]
 
 if $0 == __FILE__ 
   tlog('start')
-  Gelbooru::Crawler.new(
-    'nude_filter',
-    #'cowgirl_position',
-    #'null_(nyanpyoun)',
-    news_only: true,
-  ).crawl
+  KEYWORDS.each do |keyword|
+    crawl(keyword)
+  end
   tlog('end')
 end
 
