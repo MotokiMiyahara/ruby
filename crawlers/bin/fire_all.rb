@@ -12,6 +12,6 @@ if $0 == __FILE__
   opt.on('-f FILE', 'dsl file'){|v| dsl_file = Pathname(v).expand_path}
   opt.parse!(ARGV)
 
-  DslParser.new(dsl_file).start
+  Crawlers::Parsers::DslParser.new(dsl_file).start
 end
 

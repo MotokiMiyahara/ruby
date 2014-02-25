@@ -64,7 +64,7 @@ module Pixiv
           #news_save: false,
           news_save: true,
           db: db,
-          dir: 'user',
+          parent_dir: 'user',
 
           user_name: user.name
         )

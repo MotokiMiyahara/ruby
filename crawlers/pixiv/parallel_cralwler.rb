@@ -58,7 +58,7 @@ module Pixiv
         news_only: false,
         news_save: true,
         db: nil,
-        dir: "",
+        parent_dir: "",
       }
       opts = default_options.merge(options)
 
@@ -74,7 +74,7 @@ module Pixiv
 
       @firefox = Mtk::Net::Firefox.new
 
-      @dest_dir = make_dest_dir(keyword, opts[:dir], @is_r18)
+      @dest_dir = make_dest_dir(keyword, opts[:parent_dir], @is_r18)
       @search_file_finder = SearchFileFinder.new(@dest_dir)
 
       if @is_r18
@@ -313,6 +313,7 @@ module Pixiv
 
     def make_dest_dir(keyword, parent_dir, is_r18)
       parent_dir = "" unless parent_dir
+      pp parent_dir
       parent_dir = parent_dir.split('/').map{|s| fix_basename(s)}.join('/')
 
       dir_prefix = is_r18 ? "r18_" : ""
