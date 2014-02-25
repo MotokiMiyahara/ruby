@@ -32,7 +32,6 @@ module Crawlers::Parsers
         #@pixiv_db = db
         @pixiv_db = nil
 
-
         parse_file # parse_fileすることで@invokersにコマンドが蓄積される
         @invokers.each(&:invoke)
 
@@ -60,9 +59,11 @@ module Crawlers::Parsers
       return unless lines.first
       case lines.first.text
       when /^:pixiv/
-        PixivParser.new(self, @pixiv_db).parse lines
+        PixivParser.new(self, @pixiv_db).parse(lines)
       when /^:yandere/
-        YandereParser.new(self, @yandere_pool).parse lines
+        YandereParser.new(self, @yandere_pool).parse(lines)
+      when /^:gelbooru/
+        GelbooruParser.new(self).parse(lines)
       else
         raise "undefined command: #{lines.first}"
       end
@@ -78,32 +79,6 @@ module Crawlers::Parsers
 
     private
 
-    #class Line
-    #  INDENT_OF = {
-    #    ' ' => 1,
-    #  }
-    #  INDENT_OF.default_proc = proc{|k, v| raise NotSupportedSpaceError, "Not supported space-charctor: #{k} #{v}"}
-
-
-    #  attr_reader :indent, :text
-    #  def initialize(str)
-    #    @indent = calc_indent str.chomp
-    #    @text = str.sub(/#.*$/, '').strip
-    #  end
-
-    #  public
-    #  def blank?
-    #    @text.empty?
-    #  end
-
-    #  private
-    #  def calc_indent str
-    #    str_indent = str.match(/^[\s|　]*/)[0]
-    #    return str_indent.scan(/[\s|　]/).map{|s| INDENT_OF[s]}.inject(0){|sum, a| sum + a}
-    #  end
-    #end
-
-    #class NotSupportedSpaceError < StandardError; end
   end
 
 

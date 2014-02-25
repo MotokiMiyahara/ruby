@@ -313,7 +313,6 @@ module Pixiv
 
     def make_dest_dir(keyword, parent_dir, is_r18)
       parent_dir = "" unless parent_dir
-      pp parent_dir
       parent_dir = parent_dir.split('/').map{|s| fix_basename(s)}.join('/')
 
       dir_prefix = is_r18 ? "r18_" : ""

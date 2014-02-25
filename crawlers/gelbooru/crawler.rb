@@ -35,22 +35,23 @@ module Gelbooru
     def initialize(
           keyword,
           news_only: false,
-          news_save: true
+          news_save: true,
+          dest_dir: nil
         )
+
 
       @keyword = keyword
       @news_only = news_only
       @news_save = news_save
 
       @firefox = Mtk::Net::Firefox.new
-      @dest_dir = make_dest_dir(keyword)
+      @dest_dir = make_dest_dir(keyword, dest_dir)
     end
 
 
 
     public
     def crawl
-      #start_index_uri = "http://gelbooru.com/index.php?page=post&s=list&tags=#{@keyword}"
       start_index_uri = "http://gelbooru.com/index.php?page=post&s=list&tags=#{URI.encode_www_form_component(@keyword)}"
       crawl_index(start_index_uri, 1)
     rescue CancellError => e
@@ -95,12 +96,12 @@ module Gelbooru
 
     end
 
-    def make_dest_dir(keyword)
-      parent_dir = "" #unless parent_dir
-      parent_dir = parent_dir.split('/').map{|s| fix_basename(s)}.join('/')
-
-      dest_dir = SEARCH_DIR.join(parent_dir, fix_basename(keyword))
+    def make_dest_dir(keyword, rerative_dest_dir)
+      rerative_dest_dir ||= fix_basename(keyword)
+      rerative_dest_dir = Pathname(rerative_dest_dir)
+      dest_dir = SEARCH_DIR + rerative_dest_dir
       dest_dir.mkpath unless dest_dir.exist?
+      pp dest_dir
       return dest_dir
     end
 
@@ -128,39 +129,6 @@ end
 KEYWORDS = [
   'nude_filter',
   'smile nipples pussy -amputee -nude_filter',
-  'cowgirl_position',
-  'girl_on_top -cowgirl_position -reverse_cowgirl_position',
-  'sitting_on_person sex -girl_on_top -cowgirl_position -reverse_cowgirl_position',
-  'happy_sex',
-  #'bust_chart',
-  'lineup -faceless -nude_filter',
-  'bikini_pull',
-
-  # ---
-  'upskirt -pantyshot',
-  'pantyshot -upskirt',
-
-  # 超高解像度 ---
-  'absurdres pussy -nude_filter',
-
-  ## ---
-  'heart-shaped_pupils',
-  'crotchless_panties',
-  'cupless_bra -crotchless_panties',
-
-  ## ---
-  'waitress nipples',
-  'maid nipples',
-  'cheerleader nipples',
-
-  # characters
-  'flandre_scarlet nipples', 
-
-  # user ---
-  'joy_division',
-  'konkitto',
-  'racco',
-  'null_(nyanpyoun)',
 ]
 
 if $0 == __FILE__ 
