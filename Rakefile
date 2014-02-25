@@ -9,5 +9,6 @@ PROJECT_DIR = File.expand_path(__dir__)
 task :git do |t|
   sh "git add -A #{PROJECT_DIR}"
   sh "git commit -m 'update project'"
+  sh "git push"
 end
 
