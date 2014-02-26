@@ -33,6 +33,10 @@ module Crawlers::Parsers
           # 追加
           opt[:news_only] = true
           opt[:news_save] = true
+        when "renew"
+          # 取りこぼし取得
+          opt[:news_only] = false
+          opt[:news_save] = true
         end
       }
       parser.parse command.split(/\s+/)
