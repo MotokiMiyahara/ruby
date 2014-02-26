@@ -30,7 +30,9 @@ module Gelbooru
     include Crawlers::Util
 
     VERBOSE = false
-    THREAD_COUNT_DOWNLOAD_IMAGES = 3
+    #THREAD_COUNT_DOWNLOAD_IMAGES = 3
+    #THREAD_COUNT_DOWNLOAD_IMAGES = 10
+    THREAD_COUNT_DOWNLOAD_IMAGES = 63
 
     def initialize(
           keyword,

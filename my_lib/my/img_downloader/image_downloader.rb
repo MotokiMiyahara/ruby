@@ -111,6 +111,8 @@ class MyDownloader
     #return lines.map{|line| "http://" + line[0]}
     lines = text.scan %r{(?<!src=")(?<!src="h)h?ttp(s?)://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
     urls = lines.map{|line| "http#{line[0]}://#{line[1]}"}
+    urls.map!{|url| url.sub(%r{/pinktower.com/}, '/')}
+    urls.uniq!
     return urls
   end
 
