@@ -32,11 +32,7 @@ module Gelbooru
     VERBOSE = false
     #THREAD_COUNT_DOWNLOAD_IMAGES = 3
     #THREAD_COUNT_DOWNLOAD_IMAGES = 10
-    #THREAD_COUNT_DOWNLOAD_IMAGES = 63
-    
-    #IMAGE_COUNT_PER_PAGE = 200 # max 200
-    IMAGE_COUNT_PER_PAGE = 200  # max 200
-    THREAD_COUNT_DOWNLOAD_IMAGES = IMAGE_COUNT_PER_PAGE
+    THREAD_COUNT_DOWNLOAD_IMAGES = 63
 
     def initialize(
           keyword,
@@ -58,35 +54,31 @@ module Gelbooru
 
     public
     def crawl
-      max_page = calc_max_page
-
-      (0..max_page).each do |page|
-        crawl_page(page)
-      end
+      start_index_uri = "http://gelbooru.com/index.php?page=post&s=list&tags=#{URI.encode_www_form_component(@keyword)}"
+      crawl_index(start_index_uri, 1)
     rescue CancellError => e
       log e.message
     end
 
 
     private
-    def crawl_page(page)
+    def ident_message
+      return "keyword='#{@keyword}'"
+    end
+
+    def crawl_index(index_uri, page)
       log "index: page=#{page} #{ident_message}"
 
-      q = {
-        page:  'dapi',
-        s:     'post',
-        q:     'index',
-        tags:  @keyword,
-        limit: IMAGE_COUNT_PER_PAGE,
-        pid:   page,
+      doc = get_document(index_uri)
+      remote_images = doc.css('.thumb').map{|thumb|
+        img = thumb.at_css('img')
+        thumbnail_uri = img['src']
+
+        anchor = thumb.at_css('a')
+        display_uri = join_uri(index_uri, anchor['href'])
+
+        next RemoteImage.new(thumbnail_uri, display_uri, @dest_dir, @news_save, @firefox)
       }
-
-      query = URI.encode_www_form(q)
-      uri = "http://gelbooru.com/index.php?#{query}"
-      doc = get_document(uri)
-
-      posts = doc.css('posts post')
-      remote_images = posts.map{|post| RemoteImage.new(post[:id], post[:file_url], @dest_dir, @news_save, @firefox)}
 
       remote_images.reject!{|image| image.search_file.exist?}
       Parallel.each(remote_images, in_threads: THREAD_COUNT_DOWNLOAD_IMAGES) {|image| image.download}
@@ -94,30 +86,16 @@ module Gelbooru
       if @news_only && remote_images.empty?
         raise CancellError, "Cancell crawling, because not found new images in {page: #{page}, keyword: '#{@keyword}'} (news_only)" 
       end
-    end
 
-    def calc_max_page
-      image_count = fetch_image_count
-      page_count = image_count.quo(IMAGE_COUNT_PER_PAGE).ceil
-      max_page = page_count - 1
-      return max_page
-    end
+      next_anchor = doc.at_css('.pagination a[alt="next"]')
+      if next_anchor
+        next_uri = join_uri(index_uri, next_anchor['href'])
+        crawl_index(next_uri, page + 1)
+      else
+        # 次のページがなければ巡回を終了
+        raise CancellError, "Reach end of index page: page=#{page} keyword=#{@keyword}"
+      end
 
-    def fetch_image_count
-      q = {
-        page:  'dapi',
-        s:     'post',
-        q:     'index',
-        tags:  @keyword,
-        limit: 0,
-        pid:   0,
-      }
-
-      query = URI.encode_www_form(q)
-      uri = "http://gelbooru.com/index.php?#{query}"
-      doc = get_document(uri)
-      posts = doc.at_css('posts')
-      return posts[:count].to_i
     end
 
     def make_dest_dir(keyword, rerative_dest_dir)
@@ -132,14 +110,9 @@ module Gelbooru
     def get_document(uri, *rest)
       retry_fetch(message: uri) do
         html = @firefox.get_html_as_utf8(uri, *rest)
-        #doc = Nokogiri::HTML(html)
-        doc = Nokogiri::XML(html)
+        doc = Nokogiri::HTML(html)
         return doc
       end
-    end
-
-    def ident_message
-      return "keyword='#{@keyword}'"
     end
   end
 

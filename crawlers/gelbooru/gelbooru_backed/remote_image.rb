@@ -12,24 +12,9 @@ module Gelbooru
       PREFIX = 'gelbooru'
 
       attr_reader :search_file
-      #def initialize(thumbnail_uri, display_uri, dest_dir, news_save, fire_fox)
-      #  @uri = thumbnail_uri.sub(%r{thumbnails}, 'images').sub(%r{thumbnail_}, '')
-      #  @id  = CGI.parse(URI(display_uri).query)['id'][0]
-
-      #  @dest_dir = dest_dir
-      #  @news_save = news_save
-      #  @firefox = fire_fox
-
-      #  @regular_file = calc_regular_image_pathname
-      #  @search_file = calc_search_image_pathname
-      #  @news_file = calc_news_image_pathname
-      #end
-
-      def initialize(id, file_uri, dest_dir, news_save, fire_fox)
-        #@uri = thumbnail_uri.sub(%r{thumbnails}, 'images').sub(%r{thumbnail_}, '')
-        #@id  = CGI.parse(URI(display_uri).query)['id'][0]
-        @uri = file_uri
-        @id = id
+      def initialize(thumbnail_uri, display_uri, dest_dir, news_save, fire_fox)
+        @uri = thumbnail_uri.sub(%r{thumbnails}, 'images').sub(%r{thumbnail_}, '')
+        @id  = CGI.parse(URI(display_uri).query)['id'][0]
 
         @dest_dir = dest_dir
         @news_save = news_save
