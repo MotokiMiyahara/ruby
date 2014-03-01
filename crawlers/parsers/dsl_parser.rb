@@ -12,9 +12,13 @@ module Crawlers::Parsers
   class Crawlers::Parsers::DslParser
 
     attr_reader :invokers
-    def initialize(file=nil)
+    def initialize(
+        file: Pathname(__FILE__).dirname.join("../dsl.txt"),
+        noop: false)
       #@file = file || __FILE__.to_pathname.dirname.join("../dsl.txt")
-      @file = file || Pathname(__FILE__).dirname.join("../dsl.txt")
+      
+      @file = file 
+      @noop = noop
 
       @yandere_pool = 
         Mtk::Concurrent::ThreadPool.new(
@@ -63,7 +67,7 @@ module Crawlers::Parsers
       when /^:yandere/
         YandereParser.new(self, @yandere_pool).parse(lines)
       when /^:gelbooru/
-        GelbooruParser.new(self).parse(lines)
+        GelbooruParser.new(self, @noop).parse(lines)
       else
         raise "undefined command: #{lines.first}"
       end

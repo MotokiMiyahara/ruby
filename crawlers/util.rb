@@ -90,7 +90,7 @@ module Crawlers::Util::Helpers::Files
     return URI.join(*strs).to_s
   end
 
-  def log(str)
+  def log(str='')
     # Parallelライブラリの使用中にputsを使用すると出力が混ざるため
     print(str.chomp + "\n")
   end

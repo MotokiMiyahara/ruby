@@ -37,6 +37,7 @@ module Gelbooru
           news_only: false,
           news_save: true,
           dest_dir: nil,
+          noop:     true,
           image_count_per_page: :auto # max 200(Gelbooru APIの仕様上)
         )
 
@@ -45,21 +46,36 @@ module Gelbooru
       @news_only = news_only
       @news_save = news_save
       @dest_dir = calc_dest_dir(keyword, dest_dir)
+      @noop = noop
 
       @image_count_per_page = calc_image_count_per_page(image_count_per_page)
 
       @firefox = Mtk::Net::Firefox.new
-      @dest_dir.mkpath unless @dest_dir.exist?
-
-      pp "arg:image_count_per_page=#{image_count_per_page}"
-      pp "@image_count_per_page=#{@image_count_per_page}"
-      pp @dest_dir
+      @dest_dir.mkpath unless @noop || @dest_dir.exist?
     end
 
 
 
     public
     def crawl
+      if @noop
+        log_status
+      else
+        do_crawl
+      end
+    end
+
+
+    private
+    def log_status
+      log '---------------------------'
+      log "@image_count_per_page=#{@image_count_per_page}"
+      log "@dest_dir=#{@dest_dir}"
+      log "@keyword=#{@keyword}"
+      log 
+    end
+
+    def do_crawl
       max_page = calc_max_page
 
       (0..max_page).each do |page|
@@ -69,8 +85,6 @@ module Gelbooru
       log e.message
     end
 
-
-    private
     def crawl_page(page)
       log "index: page=#{page} #{ident_message}"
 

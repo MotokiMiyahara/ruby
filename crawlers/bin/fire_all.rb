@@ -7,11 +7,12 @@ require_relative '../parsers'
 if $0 == __FILE__
   Thread.abort_on_exception = true
 
-  dsl_file = nil
-  opt = OptionParser.new
-  opt.on('-f FILE', 'dsl file'){|v| dsl_file = Pathname(v).expand_path}
-  opt.parse!(ARGV)
+  opts = {}
+  parser = OptionParser.new
+  parser.on('-f FILE', 'dsl file'){|v| opts[:file] = Pathname(v).expand_path}
+  parser.on('--noop', 'no oparation'){|v| opts[:noop] = true}
+  parser.parse!(ARGV)
 
-  Crawlers::Parsers::DslParser.new(dsl_file).start
+  Crawlers::Parsers::DslParser.new(opts).start
 end
 

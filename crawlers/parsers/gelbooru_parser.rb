@@ -7,8 +7,9 @@ require_relative 'commons/dired_parser'
 
 module Crawlers::Parsers
   class GelbooruParser
-    def initialize(parent)
+    def initialize(parent, noop)
       @parent = parent
+      @noop = noop
     end
     
     public
@@ -51,6 +52,7 @@ module Crawlers::Parsers
         opt[:image_count_per_page] =  var
       }
       parser.parse command.split(/\s+/)
+      opt[:noop] = @noop
       return opt
     end
 
