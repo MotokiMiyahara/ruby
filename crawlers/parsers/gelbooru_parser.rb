@@ -39,6 +39,17 @@ module Crawlers::Parsers
           opt[:news_save] = true
         end
       }
+      parser.on("--image_count_per_page=VAL"){|v|
+        var = case v
+              when /^auto$/i
+                :auto
+              when /\d+/
+                v.to_i
+              else
+                raise ArgumentError, "image_count_per_page is 'auto' or number"
+              end
+        opt[:image_count_per_page] =  var
+      }
       parser.parse command.split(/\s+/)
       return opt
     end

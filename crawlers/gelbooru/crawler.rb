@@ -30,28 +30,30 @@ module Gelbooru
     include Crawlers::Util
 
     VERBOSE = false
-    #THREAD_COUNT_DOWNLOAD_IMAGES = 3
-    #THREAD_COUNT_DOWNLOAD_IMAGES = 10
-    #THREAD_COUNT_DOWNLOAD_IMAGES = 63
-    
-    #IMAGE_COUNT_PER_PAGE = 200 # max 200
-    IMAGE_COUNT_PER_PAGE = 200  # max 200
-    THREAD_COUNT_DOWNLOAD_IMAGES = IMAGE_COUNT_PER_PAGE
+    THREAD_COUNT_DOWNLOAD_IMAGES = 200
 
     def initialize(
           keyword,
           news_only: false,
           news_save: true,
-          dest_dir: nil
+          dest_dir: nil,
+          image_count_per_page: :auto # max 200(Gelbooru APIの仕様上)
         )
 
 
       @keyword = keyword
       @news_only = news_only
       @news_save = news_save
+      @dest_dir = calc_dest_dir(keyword, dest_dir)
+
+      @image_count_per_page = calc_image_count_per_page(image_count_per_page)
 
       @firefox = Mtk::Net::Firefox.new
-      @dest_dir = make_dest_dir(keyword, dest_dir)
+      @dest_dir.mkpath unless @dest_dir.exist?
+
+      pp "arg:image_count_per_page=#{image_count_per_page}"
+      pp "@image_count_per_page=#{@image_count_per_page}"
+      pp @dest_dir
     end
 
 
@@ -77,7 +79,7 @@ module Gelbooru
         s:     'post',
         q:     'index',
         tags:  @keyword,
-        limit: IMAGE_COUNT_PER_PAGE,
+        limit: @image_count_per_page,
         pid:   page,
       }
 
@@ -98,7 +100,7 @@ module Gelbooru
 
     def calc_max_page
       image_count = fetch_image_count
-      page_count = image_count.quo(IMAGE_COUNT_PER_PAGE).ceil
+      page_count = image_count.quo(@image_count_per_page).ceil
       max_page = page_count - 1
       return max_page
     end
@@ -120,13 +122,23 @@ module Gelbooru
       return posts[:count].to_i
     end
 
-    def make_dest_dir(keyword, rerative_dest_dir)
+    def calc_dest_dir(keyword, rerative_dest_dir)
       rerative_dest_dir ||= fix_basename(keyword)
       rerative_dest_dir = Pathname(rerative_dest_dir)
       dest_dir = SEARCH_DIR + rerative_dest_dir
-      dest_dir.mkpath unless dest_dir.exist?
-      pp dest_dir
       return dest_dir
+    end
+
+    # @return [Integer]
+    def calc_image_count_per_page(var)
+      case var
+      when :auto
+        @dest_dir.exist? ? 30 : 200
+      when Integer
+        image_count_per_page
+      else
+        raise ArgumentError, "image_count_per_page is 'auto' or number"
+      end
     end
 
     def get_document(uri, *rest)
