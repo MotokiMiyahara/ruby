@@ -85,14 +85,15 @@ module Crawlers::Parsers::Commons
     end
 
     class Item
-      attr_reader :keyword
-      def initialize(categories, keyword)
+      attr_reader :keyword, :categories
+      def initialize(categories, keyword, dir_basename: keyword)
         @categories = categories.dup.freeze
         @keyword = keyword.dup.freeze
+        @dir_basename = dir_basename
       end
 
       def dir
-        names = @categories + [@keyword]
+        names = @categories + [@dir_basename]
         names.reject!(&:empty?)
         names.map!{|name| Crawlers::Util::fix_basename(name)}
         return Pathname(names[0]).join(*names[1..-1])
@@ -101,6 +102,8 @@ module Crawlers::Parsers::Commons
       def inspect
         "d=#{dir}"
       end
+
+      private
     end
 
   end
