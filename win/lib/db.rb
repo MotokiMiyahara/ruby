@@ -40,6 +40,7 @@ class Db
         end
       }
       images.compact!
+      images.uniq!(&:md5)
       images
     end
   end
