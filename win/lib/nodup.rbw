@@ -1,16 +1,11 @@
-# vim:set fileencoding=utf-8:
+# vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
 #require 'pathname'
 #require 'pp'
-require 'digest/md5'
-require 'pstore'
-#require 'mtk/util'
-
-#exit if (defined?(Ocra))
+require_relative 'db'
 
 OUT_SZ7 = File.expand_path('tmp_uniq.sz7', __dir__)
 LOG_FILE = File.expand_path('nodup.log', __dir__)
-DB_FILE = File.expand_path('db.dat', __dir__)
 
 #OUT_SZ7  = 'tmp_uniq.sz7'
 #LOG_FILE = 'nodup.log'
@@ -26,11 +21,7 @@ class Nodup
     exit unless sz7
 
     images = read_sz7(sz7)
-    uniq_images = images.uniq(&:md5)
-
-    puts "#{images.size} -> #{uniq_images.size}"
-
-    write_sz7(OUT_SZ7, uniq_images)
+    write_sz7(OUT_SZ7, images)
     invoke_viewer(OUT_SZ7)
   end
 
@@ -45,7 +36,7 @@ class Nodup
 
   def read_sz7(file)
     pathes = File.read(file, encoding: 'SJIS').split("\n")
-    images = @db.images(pathes)
+    images = @db.uniq_images(pathes)
     return images
   end
 
@@ -66,28 +57,6 @@ ensure
   $stderr = STDERR
 end
 
-class Image < Struct.new(:path, :md5); end
-
-class Db 
-  def initialize
-    @db = PStore.new(DB_FILE)
-  end
-
-  def images(pathes)
-    @db.transaction do
-      images = pathes.map {|p|
-        path = p.gsub('/', '\\')
-        begin
-          @db[path] ||= Image.new(path, Digest::MD5.file(path).hexdigest)
-        rescue Errno::ENOENT => e
-          nil
-        end
-      }
-      images.compact!
-      images
-    end
-  end
-end
 
 
 if $0 == __FILE__
