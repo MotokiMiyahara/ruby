@@ -24,7 +24,7 @@ class Image
 end
 
 class Db 
-  DB_FILE = File.expand_path('db.dat', __dir__)
+  DB_FILE = File.expand_path('../watched/db/db.dat', __dir__)
   def initialize
     @db = PStore.new(DB_FILE)
   end

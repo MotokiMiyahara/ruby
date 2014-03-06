@@ -5,14 +5,19 @@ require_relative 'lib/image_register'
 require 'pp'
 require 'pathname'
 
+
 CSV_LIST = FileList.new("#{__dir__}/watched/*.csv")
 TIME_STAMP_LIST = CSV_LIST.gsub('/watched/', '/watched/timestamp/').ext('.ts')
-#TIME_STAMP_LIST = CSV_LIST.ext('.ts')
 TIME_STAMP_DIR = "#{__dir__}/watched/timestamp"
 
+require 'rake/clean'
+CLEAN.include(TIME_STAMP_DIR)
+CLOBBER.include(Db::DB_FILE)
 
 directory TIME_STAMP_DIR
 task :default => [:import_md5]
+
+desc 'import md5'
 task :import_md5 => [TIME_STAMP_DIR, *TIME_STAMP_LIST]
 
 PROC_FIND_CSV = proc{|task_name|
