@@ -29,5 +29,5 @@ PROC_FIND_CSV = proc{|task_name|
 rule '.ts' => [PROC_FIND_CSV] do |t|
   puts "import md5 from '#{t.source}'"
   ImageRegister::regist(t.source)
-  sh "touch #{t.name}"
+  sh "touch #{t.name.gsub("'", "\\\\'")}"
 end
