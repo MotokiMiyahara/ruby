@@ -7,7 +7,8 @@ require 'pathname'
 
 
 CSV_LIST = FileList.new("#{__dir__}/watched/*.csv")
-TIME_STAMP_LIST = CSV_LIST.gsub('/watched/', '/watched/timestamp/').ext('.ts')
+TIME_STAMP_LIST = CSV_LIST.pathmap('%d/timestamp/%n.ts')
+#TIME_STAMP_LIST = CSV_LIST.gsub('/watched/', '/watched/timestamp/').ext('.ts')
 TIME_STAMP_DIR = "#{__dir__}/watched/timestamp"
 
 require 'rake/clean'
