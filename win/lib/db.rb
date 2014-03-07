@@ -48,7 +48,8 @@ class Db
   def regist_images(rows)
     @db.transaction do
       rows.each do |row|
-        @db[row[:path]] ||= Image.new(row[:path], row[:md5])
+        path = Image.dos_path(row[:path])
+        @db[path] ||= Image.new(path, row[:md5])
       end
     end
   end
