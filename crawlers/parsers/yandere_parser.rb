@@ -5,9 +5,9 @@ require_relative '../yande.re/crawler'
 
 class YandereParser
 
-  def initialize parent, pool
+  def initialize(parent)
     @parent = parent
-    @yandere_pool = pool
+    #@yandere_pool = pool
   end
 
   public
@@ -47,7 +47,7 @@ class YandereParser
 
   def do_crawl opt, keywords
     keywords.each do |keyword|
-      @parent.add_invokers(
+      @parent.add_invoker(
         YandereInvoker.new(
           @yandere_pool, 
           keyword,
@@ -81,11 +81,11 @@ class YandereParser
     end
 
     def invoke
-      @yandere_pool.add_producer {|pool|
+      #@yandere_pool.add_producer {|pool|
         Yandere::Crawler.new(
           *@args
         ).crawl
-      }
+      #}
     end
   end
 end

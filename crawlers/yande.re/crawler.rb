@@ -6,6 +6,7 @@ require 'pp'
 require 'uri'
 require 'cgi'
 
+require 'parallel'
 require 'my/config'
 require 'mtk/net/firefox'
 require 'mtk/net/uri_getter'
@@ -31,7 +32,9 @@ module Yandere
   #   news_saveが真のとき
   #     ・新規に保存した画像へのハードリンクをnewsディレクトリに追加します
   class Crawler
-  include Crawlers::Util
+    include Crawlers::Util
+
+    THREAD_COUNT_DOWNLOAD_IMAGES = 5
 
     # pool: ThreadPool(mtk/concurrent/thread_pool)
     def initialize pool, keyword, opts = {}
@@ -83,15 +86,17 @@ p base_uri
       pattern = Regexp.new pattern
 
       #html.scan(pattern).sort.reverse.each do |s|
-      html.scan(pattern) do |s|
+      remote_images = html.scan(pattern).map{|s|
         id = s[0]
         path = CGI.unescapeHTML(s[1])
         ext = path.match(/\.[^.]+$/)[0]
         dest_file = @dest_dir.join("#{id}#{ext}")
 
         image_uri = join_uri base_uri, path
-        download_image image_uri, base_uri, dest_file
-      end
+        {image_uri: image_uri, dest_file: dest_file}
+      }
+
+      Parallel.each(remote_images, in_threads: THREAD_COUNT_DOWNLOAD_IMAGES) {|h| download_image(h[:image_uri], base_uri, h[:dest_file])}
 
       # 次のページがなければ巡回を終了
       unless html =~ %r{<link href="[^"]+" rel="next" title="Next Page" />}
@@ -114,14 +119,14 @@ p base_uri
     def download_image uri, referer, dest_file
       raise CancellError, "Cancell crawling, because found #{dest_file} (news_only)" if @news_only && dest_file.exist?
 
-      @pool.push_task do
+      #@pool.push_task do
         begin
           do_download_image uri, referer, dest_file
         rescue => e
           puts e
           pp e.backtrace
         end
-      end
+        #end
     end
 
     def do_download_image uri, referer, dest_file

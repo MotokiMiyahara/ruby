@@ -10,21 +10,21 @@ module Crawlers::Parsers
   class PixivParser
     #include Crawlers::Util
 
-    def initialize parent, db
+    def initialize(parent, db)
       @parent = parent
       @db = db
     end
     
     public
     def parse lines
-      opt = parseOption lines.shift.text
-      dirs_and_keywords = shift_keywords lines
+      opt = parseOption(lines.shift.text)
+      dirs_and_keywords = shift_keywords(lines)
       crawl opt, dirs_and_keywords
-      @parent.parse lines
+      @parent.parse(lines)
     end
 
     private
-    def parseOption command
+    def parseOption(command)
       opt = {
         db: @db
       }
@@ -74,7 +74,7 @@ module Crawlers::Parsers
     end
 
     def do_crawl(keyword, dir, opt)
-      @parent.add_invokers(PixivInvoker.new(keyword, opt.merge({parent_dir: dir})))
+      @parent.add_invoker(PixivInvoker.new(keyword, opt.merge({parent_dir: dir})))
     end
 
     def shift_keywords lines

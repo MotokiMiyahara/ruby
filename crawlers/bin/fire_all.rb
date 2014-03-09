@@ -13,6 +13,6 @@ if $0 == __FILE__
   parser.on('--noop', 'no oparation'){|v| opts[:noop] = true}
   parser.parse!(ARGV)
 
-  Crawlers::Parsers::DslParser.new(opts).start
+  Crawlers::Parsers::BootStrapper.new(opts).start
 end
 

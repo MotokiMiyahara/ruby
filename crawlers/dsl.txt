@@ -1,1 +1,0 @@
-/home/mtk/.mtk/crawlers/dsl/dsl.txt
