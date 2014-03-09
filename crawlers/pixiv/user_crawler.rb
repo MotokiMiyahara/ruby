@@ -134,7 +134,7 @@ class Pixiv::UserCrawler::UserData
     def dirs
       result = []
       users do |user|
-        pp [user.id, user.name]
+        #pp [user.id, user.name]
         result << Pathname('user').join(fix_basename("#{user.id}_#{user.name}"))
       end
       result.select!{|p| Pixiv::PIXIV_DIR.join(p).exist?}

@@ -23,7 +23,7 @@ end
 
 module Yandere
 
-  YANDERE_DIR = My::CONFIG.dest_dir + 'crawler/yande.re'
+  YANDERE_DIR = Crawlers::Config::app_dir + 'yande.re'
   NEWS_DIR = YANDERE_DIR + "news"
 
   # オプション引数の説明

@@ -23,6 +23,7 @@ class PixivGui
 
   def initialize
     @image_viewer = Crawlers::ImageViewer.new
+    @image_db = Crawlers::ImageStore.new
   end
 
   public
@@ -74,24 +75,33 @@ class PixivGui
     }
 
     # 画像ディレクトリ
-    parser = DslParser.new
-    parser.parse_file
+    #parser = DslParser.new
+    #parser.parse_file
+
+    invokers = Crawlers::Parsers::BootStrapper.new.parse_invokers
     
-    search_data = parser.invokers.select{|invoker| invoker.type == :pixiv}.map(&:search_dir).reject(&:nil?).map{|p| Pathname(p).join('r18')}.find_all{|d| item_dir(d).exist?}
-    user_data = Pixiv::UserCrawler::UserData.dirs
+    puts Pixiv::PIXIV_DIR
+    search_data = invokers.select{|invoker| invoker.type == :pixiv}.map(&:search_dir).compact
+    search_data.map!{|p| Pathname('search').join(p, 'r18')}
+    search_data.select!{|d| item_dir(d).exist?}
+    search_data.sort_by!{|path| item_dir(path).mtime}.reverse!
+    #puts search_data.map{|s|s.to_s.encode('sjis')}
 
-    dir_data = [] << search_data << user_data
-    dir_data.map!{|data| data.sort_by!{|path| item_dir(path).mtime}.reverse!}
+    #user_data = Pixiv::UserCrawler::UserData.dirs
+    user_data = user_children
+    user_data.map!{|data| data.relative_path_from(Pixiv::PIXIV_DIR)}
 
-    #keep_data = Pathname.glob("#{keep_dir}/*/")
-    keep_data = keep_dir.children(true).select(&:directory?)
+    pixiv_data = [] << search_data << user_data
+    #pixiv_data.map!{|data| data.sort_by!{|path| item_dir(path).mtime}.reverse!}
 
-    #pp("#{keep_dir.to_s.encode('sjis')}/*/")
-    #pp keep_dir.children
-    pp keep_data
+    yandere_keyword = %w{news pussy nipples}
+    yandere_data = yandere_keyword.map{|word| "@yandere:" << word}
 
+    #keep_data = keep_dir.children(true).select(&:directory?)
+    keep_data = Pathname.glob("#{keep_dir}/*[0-9]")
 
-    list_data = [].push(commands_data, dir_data, keep_data).flatten!.map(&:to_s)
+    list_data = [].push(commands_data, pixiv_data, yandere_data, keep_data).flatten!.map(&:to_s)
+    tlog('end  of reading data')
     return list_data
   end
 
@@ -112,11 +122,11 @@ class PixivGui
     case item
     when /^:/
       execute_command(item)
+    when /^@yandere:/
+      invoke_image_viewer_with_cache(yandere_dir(item))
     else
-      #invoke_image_viewer_with_cache r18_dir(item)
-      invoke_image_viewer_with_cache item_dir(item)
+      invoke_image_viewer_with_cache(item_dir(item))
     end
-
   end
 
 
@@ -167,12 +177,12 @@ class PixivGui
       return
     when ':keep'
       keep_dir
+    when /^:/
+      puts "no such command: #{item}"
+      raise
+    when /^@yandere:/
+      yandere_dir(item)
     else 
-      if item =~ /^:/
-        puts "no such command: #{item}"
-        raise
-      end
-      #r18_dir(item)
       item_dir(item)
     end
     return unless prompt("#{dir}の巡回履歴を削除してよろしいですか？")
@@ -182,12 +192,12 @@ class PixivGui
   #---------------------------
   # :section: general
   #---------------------------
-  def r18_dir(rerative_dir)
-    return Pixiv::PIXIV_DIR.join(rerative_dir, 'r18')
+  def r18_dir(relative_dir)
+    return Pixiv::PIXIV_DIR.join(relative_dir, 'r18')
   end
 
-  def item_dir(rerative_dir)
-    return Pixiv::PIXIV_DIR.join(rerative_dir)
+  def item_dir(relative_dir)
+    return Pixiv::PIXIV_DIR.join(relative_dir)
   end
 
   def news_dir
@@ -199,7 +209,18 @@ class PixivGui
     return Crawlers::Config::keep_dir
   end
 
+  def user_children
+    parent = Pixiv::USER_DIR
+    #names = `start /MIN cmd.exe /C  dir "#{parent.to_s.encode('SJIS')}" /B /O:-D`.encode('UTF-8').split(/\r?\n/)
+    names = `dir "#{parent.to_s.encode('SJIS')}" /B /O:-D`.encode('UTF-8').split(/\r?\n/)
+    puts names
+    return names.map{|name| parent + name}
+  end
 
+  def yandere_dir(item)
+    relative_dir = item.sub(/^@yandere:/, '')
+    return Yandere::YANDERE_DIR.join(relative_dir)
+  end
 end
 
 if $0 == __FILE__

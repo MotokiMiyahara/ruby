@@ -1,11 +1,38 @@
 # vim:set fileencoding=utf-8:
 
 require 'my/config'
-require 'pathname'
+
+
+module My
+  class Config
+
+    def dest_dir
+      Pathname.new('/samba/generated_data')
+    end
+
+    # ---------------------
+    # :section: バックアップ
+    # ---------------------
+    def backup_sources
+      %w{C:/GitHub/study}.map(&Pathname.method(:new))
+    end
+
+    def backup_dests
+      %w{C:/backup I:/backup/study}.map(&Pathname.method(:new))
+    end
+
+    #p DEFAULT_CONFIG_FILE
+    #load DEFAULT_CONFIG_FILE if DEFAULT_CONFIG_FILE.exist?
+  end
+
+  CONFIG = Config.new
+end
+
+
 
 module Crawlers
   class Config
-    USER_CONFIG_FILE = Pathname("#{ENV['HOME']}/.mtk/my/app/crawlers/config.rb")
+    DEFAULT_CONFIG_FILE = "#{ENV['HOME']}/.mtk/my/config.rb"
 
     class << self
       def app_dir
@@ -36,15 +63,14 @@ module Crawlers
       end
 
       def load_user_file
-        if USER_CONFIG_FILE.exist?
-          puts "loading: #{USER_CONFIG_FILE}"
-          load USER_CONFIG_FILE
-        end
+
       end
+
+      init
+
     end
   end
 end
 
-Crawlers::Config::load_user_file
 
 

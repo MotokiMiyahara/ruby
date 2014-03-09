@@ -78,7 +78,8 @@ module Crawlers::Parsers::Commons
 
     class Info
       attr_reader :indent, :categories
-      def initialize(indent:, categories: [])
+      def initialize(indent: nil, categories: [])
+        raise unless indent
         @indent = indent
         @categories = categories.dup.freeze
       end

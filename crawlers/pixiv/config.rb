@@ -1,13 +1,13 @@
 # vim:set fileencoding=utf-8:
 
-require 'my/config'
+require_relative '../config'
 require_relative '../errors'
 require 'uri'
 require 'pp'
 
 
 module Pixiv
-  PIXIV_DIR     = My::CONFIG.dest_dir + 'crawler/pixiv'
+  PIXIV_DIR     = Crawlers::Config::app_dir + 'pixiv'
   NEWS_DIR      = PIXIV_DIR + "news"
   SEARCH_DIR    = PIXIV_DIR + "search"
   USER_DIR      = PIXIV_DIR + "user"
