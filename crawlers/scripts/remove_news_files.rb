@@ -7,6 +7,7 @@ require_relative 'commons'
 require_relative '../pixiv/config'
 require_relative '../moeren/config'
 require_relative '../yande.re/crawler'
+require_relative '../gelbooru/config'
 
 module Scripts; end
 
@@ -23,6 +24,8 @@ class Scripts::RemveNewsFiles
         Moeren::Config::NEWS_DIR
       when 'yandere'
         Yandere::NEWS_DIR
+      when 'gelbooru'
+        Gelbooru::NEWS_DIR
       else
         raise "wrong type=#{type}"
       end

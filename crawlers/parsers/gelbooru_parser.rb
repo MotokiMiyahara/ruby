@@ -121,7 +121,7 @@ module Crawlers::Parsers
     end
 
     def do_crawl(keyword, dest_dir, opt)
-      @parent.add_invokers(Invoker.new(keyword, opt.merge({dest_dir: dest_dir})))
+      @parent.add_invoker(Invoker.new(keyword, opt.merge({dest_dir: dest_dir})))
     end
 
     class Invoker

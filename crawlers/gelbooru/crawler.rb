@@ -149,7 +149,7 @@ module Gelbooru
       when :auto
         @dest_dir.exist? ? 30 : 200
       when Integer
-        image_count_per_page
+        var
       else
         raise ArgumentError, "image_count_per_page is 'auto' or number"
       end

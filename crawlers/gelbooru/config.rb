@@ -7,7 +7,8 @@ require 'pp'
 
 
 module Gelbooru
-  SITE_DIR      = My::CONFIG.dest_dir + 'crawler/gelbooru'
+  #SITE_DIR      = My::CONFIG.dest_dir + 'crawler/gelbooru'
+  SITE_DIR      = Crawlers::Config::app_dir + 'gelbooru'
   NEWS_DIR      = SITE_DIR + "news"
   SEARCH_DIR    = SITE_DIR + "search"
   ALL_IMAGE_DIR = SITE_DIR + ".all_images"
