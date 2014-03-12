@@ -65,7 +65,7 @@ class MyDownloader
 
   private
   def download_from_text(text)  
-    puts text
+    log text
     lines = text.split(/\r?\n/)
     lines.each{|line| line.sub!(/#.*$/, '')}
     lines.each{|line| line.strip!}
@@ -109,7 +109,7 @@ class MyDownloader
   def extract_image_urls text
     #lines = text.scan %r{h?ttp://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
     #return lines.map{|line| "http://" + line[0]}
-    lines = text.scan %r{(?<!src=")(?<!src="h)h?ttp(s?)://([^<>\r\n]*?\.(?:jpg|bmp|png|gif))}i
+    lines = text.scan %r{(?<!src=")(?<!src="h)h?ttp(s?)://([^<>\r\n]*?\.(?:jpeg|jpg|bmp|png|gif))}i
     urls = lines.map{|line| "http#{line[0]}://#{line[1]}"}
     urls.map!{|url| url.sub(%r{/pinktower.com/}, '/')}
     urls.uniq!
@@ -138,11 +138,11 @@ class MyDownloader
       return do_download_from_url(url, dir)
     }
   rescue *NETWORK_ERRORS => e
-    puts "#{e.message} (#{e.class}) url=#{url}"
+    log "#{e.message} (#{e.class}) url=#{url}"
     #add_to_ng_list(url)
     return ImageResponse.new(url, :ng)
   rescue => e
-    puts "#{e.message} (#{e.class}) url=#{url}"
+    log "#{e.message} (#{e.class}) url=#{url}"
     if e.instance_of?(RuntimeError) && e.message =~ /^redirection forbidden:/
       # add_to_ng_list(url)
       return ImageResponse.new(url, :ng)
@@ -158,7 +158,7 @@ class MyDownloader
       return ImageResponse.new(url, :exists)
     end
 
-    puts url
+    log url
     body = UriGetter.get_binary(url)
     write_image(image, body)
     FileUtils.touch(image) if File.exists?(image)
@@ -192,8 +192,12 @@ class MyDownloader
     uri.is_a?(URI::FTP) 
 
   rescue URI::Error => e
-    puts e.message
+    log e.message
     return false
+  end
+
+  def log(*strs)
+    print(strs.join("\n") + "\n")
   end
 
 end
