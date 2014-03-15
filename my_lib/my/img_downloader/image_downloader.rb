@@ -32,7 +32,8 @@ class MyDownloader
   DEST_DIR = My::CONFIG::dest_dir + 'crawler/2ch'
 
   TIME_OUT = 10
-  THREAD_COUNT_IMAGE_DOWNLOAD = 50
+  #THREAD_COUNT_IMAGE_DOWNLOAD = 50
+  THREAD_COUNT_IMAGE_DOWNLOAD = 10
 
   NETWORK_ERRORS = [
       TimeoutError,
