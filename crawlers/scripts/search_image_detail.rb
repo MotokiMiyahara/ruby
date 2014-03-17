@@ -45,10 +45,15 @@ class Scripts::SearchImageDetail
 end
 
 if $0 == __FILE__
+  begin
   include Scripts
   script_header
   image_filename = ARGV[0]
   Scripts::SearchImageDetail::execute(image_filename)
+ensure
+  puts 'Hit any key.'
+  gets
+end
 end
 
 
