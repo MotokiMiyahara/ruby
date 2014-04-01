@@ -110,13 +110,15 @@ module Pixiv
       end
     rescue CancellError => e
       log e.message
+    rescue Crawlers::DataSourceError => e
+      log e.message
     end
 
     def ident_message
       return "keyword='#{@keyword}'"
     end
 
-    def crawl_index page
+    def crawl_index(page)
       #log "index: page=#{page} keyword=#{@keyword}"
       log "index: page=#{page} #{ident_message}"
       base_uri = index_uri(page)

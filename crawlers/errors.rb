@@ -2,7 +2,14 @@
 
 
 module Crawlers
-  class DataSourceError < StandardError; end
+  class DataSourceError < StandardError
+    def message
+      return super unless cause
+      return <<-"EOS".split("\n").map(&:strip).join("\n")
+        #{super} cause_class='#{cause.class.name}'
+        #{cause.message}
+      EOS
+    end
+  end
 end
-
 

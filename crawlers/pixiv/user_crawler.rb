@@ -89,12 +89,12 @@ module Pixiv
       return dest_dir
     end
 
-    def index_uri page
+    def index_uri(page)
       h = {
         id: @keyword,
         p: page,
       }
-      query = URI.encode_www_form h
+      query = URI.encode_www_form(h)
       return "http://www.pixiv.net/member_illust.php?#{query}"
     end
 
