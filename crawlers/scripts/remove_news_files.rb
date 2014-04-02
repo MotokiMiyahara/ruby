@@ -39,7 +39,7 @@ class Scripts::RemveNewsFiles
       exit unless should_delete
 
       Crawlers::Util::clean_up_dir(news_dir)
-      puts 'finish deleting.'
+      puts "finish deleting. (#{news_dir})"
     end
 
     def say_yes?(prompt)

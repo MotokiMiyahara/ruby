@@ -131,6 +131,8 @@ module Gelbooru
 
       query = URI.encode_www_form(q)
       uri = "http://gelbooru.com/index.php?#{query}"
+      log "api-uri='#{uri}'"
+
       doc = get_document(uri)
       posts = doc.at_css('posts')
       return posts[:count].to_i
