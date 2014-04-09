@@ -101,6 +101,7 @@ module Crawlers::Util::Helpers::Files
     OpenURI::HTTPError,
     Timeout::Error,
     EOFError,
+    Errno::ECONNREFUSED,
     Crawlers::DataSourceError,
   ].freeze
 
