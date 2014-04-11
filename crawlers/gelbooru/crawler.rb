@@ -136,6 +136,7 @@ module Gelbooru
 
       doc = get_document(uri)
       posts = doc.at_css('posts')
+      pp doc unless posts
       return posts[:count].to_i
     end
 
