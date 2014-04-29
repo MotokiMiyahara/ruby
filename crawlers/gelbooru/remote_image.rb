@@ -25,11 +25,12 @@ module Gelbooru
       #  @news_file = calc_news_image_pathname
       #end
 
-      def initialize(id, file_uri, dest_dir, news_save, fire_fox)
+      def initialize(id, file_uri, tags, dest_dir, news_save, fire_fox)
         #@uri = thumbnail_uri.sub(%r{thumbnails}, 'images').sub(%r{thumbnail_}, '')
         #@id  = CGI.parse(URI(display_uri).query)['id'][0]
         @uri = file_uri
         @id = id
+        @tags = tags
 
         @dest_dir = dest_dir
         @news_save = news_save
@@ -49,6 +50,7 @@ module Gelbooru
       end
       private :calc_regular_image_pathname
 
+
       def calc_search_image_pathname
         return calc_pathname_in_dir(@dest_dir)
       end
@@ -65,7 +67,23 @@ module Gelbooru
         file = dir.join("#{PREFIX}_#{@id}_#{basename}")
         return file
       end
-      private :calc_pathname_in_dir
+
+      #private :calc_pathname_in_dir
+      #def calc_pathname_in_dir_with_tags(dir)
+      #  uri = URI(@uri)
+      #  ext = uri.path.match(/\.\w+/)[0]
+      #  tagname = filename_from_tags(@tag)
+
+      #  file = dir.join("#{PREFIX}_#{@id}_#{tagname}#{ext}")
+      #  return file
+      #end
+      #private :calc_pathname_in_dir_with_tags
+
+      #def filename_from_tags(tags)
+      #  tag_list = @tags.split(/\s+/)
+      #  return "empty" if tag_list.empty?
+      #  return tag_list[1..-1].map{|tag| "【#{tag}】"}.join
+      #end
 
       def download
         download_image(@uri)

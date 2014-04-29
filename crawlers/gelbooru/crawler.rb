@@ -31,7 +31,8 @@ module Gelbooru
 
     VERBOSE = false
     #THREAD_COUNT_DOWNLOAD_IMAGES = 200
-    THREAD_COUNT_DOWNLOAD_IMAGES = 20
+    #THREAD_COUNT_DOWNLOAD_IMAGES = 20
+    THREAD_COUNT_DOWNLOAD_IMAGES = 10
 
     def initialize(
           keyword,
@@ -103,7 +104,13 @@ module Gelbooru
       doc = get_document(uri)
 
       posts = doc.css('posts post')
-      remote_images = posts.map{|post| RemoteImage.new(post[:id], post[:file_url], @dest_dir, @news_save, @firefox)}
+      remote_images = posts.map{|post|
+        RemoteImage.new(
+          post[:id],
+          post[:file_url],
+          post[:tags],
+          @dest_dir, @news_save, @firefox)
+      }
 
       remote_images.reject!{|image| image.search_file.exist?}
       Parallel.each(remote_images, in_threads: THREAD_COUNT_DOWNLOAD_IMAGES) {|image| image.download}
@@ -126,7 +133,8 @@ module Gelbooru
         s:     'post',
         q:     'index',
         tags:  @keyword,
-        limit: 0,
+        #limit: 0,
+        limit: 1,
         pid:   0,
       }
 
@@ -134,10 +142,12 @@ module Gelbooru
       uri = "http://gelbooru.com/index.php?#{query}"
       log "api-uri='#{uri}'"
 
-      doc = get_document(uri)
-      posts = doc.at_css('posts')
-      pp doc unless posts
-      return posts[:count].to_i
+      retry_fetch do
+        doc = get_document(uri)
+        posts = doc.at_css('posts')
+        raise Crawlers::DataSourceError, "document doesn't have <posts>-tag." unless posts
+        return posts[:count].to_i
+      end
     end
 
     def calc_dest_dir(keyword, rerative_dest_dir)
