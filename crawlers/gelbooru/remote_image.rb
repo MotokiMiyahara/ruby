@@ -43,7 +43,7 @@ module Gelbooru
 
       def calc_regular_image_pathname
         uri = URI(@uri)
-        number = uri.path.match(%r{/[^/]+/(\d+)/}).to_a[1]
+        number = uri.path.match(%r{^/[^/]+/(\d+)/}).to_a[1]
         dir = ALL_IMAGE_DIR.join(number)
         dir.mkpath unless dir.exist?
         return calc_pathname_in_dir(dir)
@@ -57,33 +57,18 @@ module Gelbooru
       private :calc_search_image_pathname
 
       def calc_news_image_pathname
-        return calc_pathname_in_dir(NEWS_DIR)
+        return calc_pathname_in_dir(NEWS_DIR, needs_place: true)
       end
       private :calc_news_image_pathname
 
-      def calc_pathname_in_dir(dir)
+      def calc_pathname_in_dir(dir, needs_place: false)
         uri = URI(@uri)
         basename = uri.path.split('/')[-1]
-        file = dir.join("#{PREFIX}_#{@id}_#{basename}")
+        ext = Pathname(basename).extname
+        place = needs_place ? "@#{@dest_dir.basename}" : ''
+        file = dir.join("#{PREFIX}_#{@id}#{place}#{ext}")
         return file
       end
-
-      #private :calc_pathname_in_dir
-      #def calc_pathname_in_dir_with_tags(dir)
-      #  uri = URI(@uri)
-      #  ext = uri.path.match(/\.\w+/)[0]
-      #  tagname = filename_from_tags(@tag)
-
-      #  file = dir.join("#{PREFIX}_#{@id}_#{tagname}#{ext}")
-      #  return file
-      #end
-      #private :calc_pathname_in_dir_with_tags
-
-      #def filename_from_tags(tags)
-      #  tag_list = @tags.split(/\s+/)
-      #  return "empty" if tag_list.empty?
-      #  return tag_list[1..-1].map{|tag| "【#{tag}】"}.join
-      #end
 
       def download
         download_image(@uri)

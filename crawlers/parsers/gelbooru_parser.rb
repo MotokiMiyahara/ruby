@@ -46,10 +46,12 @@ module Crawlers::Parsers
     
     public
     def parse(lines)
+
       opt = parseOption(lines.shift.text)
       items = Commons::DiredParser.new.parse(lines)
-      parsed_items = parse_items(items)
-      crawl(opt, parsed_items)
+      items = expand_items(items)
+
+      crawl(opt, items)
       @parent.parse(lines)
     end
 
@@ -89,39 +91,32 @@ module Crawlers::Parsers
       return opt
     end
 
-    def parse_items(items)
+    # $で始まるキーワードを展開する
+    def expand_items(items)
       parsed_items = items.flat_map{|item|
         next [item] unless item.keyword =~ /^\$/
 
-        # $で始まるキーワードを展開する
         base_keyword = item.keyword.sub(/^\$/, '')
         new_categores = item.categories + [base_keyword]
         
-        all = Commons::DiredParser::Item.new(
-          new_categores,
-          [base_keyword, COMMON_KEYWORD].join(' '),
-          dir_basename: 'all'
-        )
-
-        extra_items = EXTRA_KEYWORDS.map{|extra_keyword|
+        expanded_items = EXTRA_KEYWORDS.map{|extra_keyword|
           new_keyword = [base_keyword, extra_keyword, COMMON_KEYWORD].join(' ')
           Commons::DiredParser::Item.new(new_categores, new_keyword)
         }
 
-        #next [all] + extra_items
-        next extra_items
+        next expanded_items
       }
       return parsed_items
     end
 
     def crawl(opt, items)
       items.each do |item|
-        do_crawl(item.keyword, item.dir, opt)
+        do_crawl(item.keyword, item.dir.parent, opt)
       end
     end
 
-    def do_crawl(keyword, dest_dir, opt)
-      @parent.add_invoker(Invoker.new(keyword, opt.merge({dest_dir: dest_dir})))
+    def do_crawl(keyword, parent_dir, opt)
+      @parent.add_invoker(Invoker.new(keyword, opt.merge({parent_dir: parent_dir})))
     end
 
     class Invoker

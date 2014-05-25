@@ -38,7 +38,7 @@ module Gelbooru
           keyword,
           news_only: false,
           news_save: true,
-          dest_dir: nil,
+          parent_dir: nil,
           noop:     true,
           image_count_per_page: :auto # max 200(Gelbooru APIの仕様上)
         )
@@ -47,7 +47,7 @@ module Gelbooru
       @keyword = keyword
       @news_only = news_only
       @news_save = news_save
-      @dest_dir = calc_dest_dir(keyword, dest_dir)
+      @dest_dir = calc_dest_dir(keyword, parent_dir)
       @noop = noop
 
       @image_count_per_page = calc_image_count_per_page(image_count_per_page)
@@ -112,6 +112,9 @@ module Gelbooru
           @dest_dir, @news_save, @firefox)
       }
 
+      #pp remote_images
+      #raise
+
       remote_images.reject!{|image| image.search_file.exist?}
       Parallel.each(remote_images, in_threads: THREAD_COUNT_DOWNLOAD_IMAGES) {|image| image.download}
 
@@ -150,11 +153,19 @@ module Gelbooru
       end
     end
 
-    def calc_dest_dir(keyword, rerative_dest_dir)
-      rerative_dest_dir ||= fix_basename(keyword)
-      rerative_dest_dir = Pathname(rerative_dest_dir)
-      dest_dir = SEARCH_DIR + rerative_dest_dir
+    def calc_dest_dir(keyword, rerative_parent_dir)
+      rerative_parent_dir ||= Pathname('.')
+      dest_dir = SEARCH_DIR + rerative_parent_dir + calc_dest_dir_basename
       return dest_dir
+    end
+
+    def calc_dest_dir_basename
+      words = @keyword.split(/\s+/)
+      words.map!{|word|
+        next word if word.start_with?('-')
+        next "【#{word}】"
+      }
+      return fix_basename(words.join('_'))
     end
 
     # @return [Integer]
