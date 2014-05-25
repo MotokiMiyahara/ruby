@@ -87,14 +87,14 @@ module Crawlers::Parsers::Commons
 
     class Item
       attr_reader :keyword, :categories
-      def initialize(categories, keyword, dir_basename: keyword)
+      #def initialize(categories, keyword, dir_basename: keyword)
+      def initialize(categories, keyword)
         @categories = categories.dup.freeze
         @keyword = keyword.dup.freeze
-        @dir_basename = dir_basename
       end
 
       def dir
-        names = @categories + [@dir_basename]
+        names = @categories + [@keyword]
         names.reject!(&:empty?)
         names.map!{|name| Crawlers::Util::fix_basename(name)}
         return Pathname(names[0]).join(*names[1..-1])
