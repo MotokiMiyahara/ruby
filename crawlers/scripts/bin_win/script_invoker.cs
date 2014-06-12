@@ -1,8 +1,14 @@
-// vim:set fileencoding=sjis ts=2 sw=2 sts=2 et:
+// vim:set fileencoding=utf8 ts=2 sw=2 sts=2 et:
 
-// コンパイル方法:
-//   windonw上のnyaosから下記コマンドを実行
-//     csc /target:winexe nodup.cs
+// Hコンパイル方法:
+//   Windows上のNyaosから下記を実行
+//     csc /target:winexe script_invoker.cs
+
+// *同名のRubyスクリプトを実行する
+// *at_pictureの外部アプリケーション指定可能なものがオプション指定なしのexeファイルのみなので作成した
+
+// for at_picture
+// exeName -> scriptName
 
 using System;
 
@@ -14,19 +20,19 @@ class Nodup {
 
   private static string RUBY = @"rubyw";
   //private static string RUBY = @"ruby";
-  private static string SCRIPT_DIR = @"lib";
-  private static string SCRIPT_EXT = @".rbw";
+  private static string SCRIPT_DIR = @"..";
+  private static string SCRIPT_EXT = @".rb";
 
   static void Main(string[] args){
-    log("aaa");
     string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
     string appDir = Path.GetDirectoryName(appPath);
     string appBasename = Path.GetFileNameWithoutExtension(System.Windows.Forms.Application.ExecutablePath);
     string scriptPath = Path.Combine(appDir, SCRIPT_DIR, appBasename + SCRIPT_EXT);
+    string[] fixedArgs = Array.ConvertAll(args, arg => "\"" + arg + "\"");
 
     ProcessStartInfo psInfo = new ProcessStartInfo();
     psInfo.FileName = RUBY;
-    psInfo.Arguments = scriptPath + " " + String.Join(" ", args);
+    psInfo.Arguments = scriptPath + " " + String.Join(" ", fixedArgs);
     //psInfo.CreateNoWindow = true;
     psInfo.CreateNoWindow = false;
     psInfo.UseShellExecute = false;

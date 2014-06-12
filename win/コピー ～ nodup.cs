@@ -1,9 +1,4 @@
 // vim:set fileencoding=sjis ts=2 sw=2 sts=2 et:
-
-// コンパイル方法:
-//   windonw上のnyaosから下記コマンドを実行
-//     csc /target:winexe nodup.cs
-
 using System;
 
 using Process = System.Diagnostics.Process;
@@ -13,20 +8,17 @@ using Path = System.IO.Path;
 class Nodup {
 
   private static string RUBY = @"rubyw";
-  //private static string RUBY = @"ruby";
-  private static string SCRIPT_DIR = @"lib";
-  private static string SCRIPT_EXT = @".rbw";
+  private static string SCRIPT = @"lib/nodup.rbw";
 
   static void Main(string[] args){
-    log("aaa");
     string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
     string appDir = Path.GetDirectoryName(appPath);
-    string appBasename = Path.GetFileNameWithoutExtension(System.Windows.Forms.Application.ExecutablePath);
-    string scriptPath = Path.Combine(appDir, SCRIPT_DIR, appBasename + SCRIPT_EXT);
+    string scriptPath = Path.Combine(appDir, SCRIPT);
 
     ProcessStartInfo psInfo = new ProcessStartInfo();
     psInfo.FileName = RUBY;
     psInfo.Arguments = scriptPath + " " + String.Join(" ", args);
+    //psInfo.Arguments = scriptPath;
     //psInfo.CreateNoWindow = true;
     psInfo.CreateNoWindow = false;
     psInfo.UseShellExecute = false;

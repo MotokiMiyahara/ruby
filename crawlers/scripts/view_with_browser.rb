@@ -27,7 +27,8 @@ class Scripts::ViewInPixiv
         # pixiv
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
-      when /^gelbooru_(\d+)_/
+      #when /^gelbooru_(\d+)_/
+      when /^gelbooru_(\d+)/
         "http://gelbooru.com/index.php?page=post&s=view&id=#{$1}"
 
       when /^(\d+)(?:_big_p\d+)?\.\w+/
@@ -45,5 +46,6 @@ if $0 == __FILE__
   include Scripts
   script_header
   image = ARGV[0]
+  puts image
   ViewInPixiv.execute(image)
 end

@@ -2,6 +2,7 @@
 
 require 'digest/md5'
 require 'pstore'
+require 'pp'
 
 class Image
 
@@ -40,8 +41,20 @@ class Db
         end
       }
       images.compact!
-      images.uniq!(&:md5)
-      images
+      #images.uniq!(&:md5)
+      #images
+      #
+
+      # at_pictureにインポートされたファイルを優先して取り出す
+      bucket = {}
+      images.each do |img|
+        next if bucket[img.md5] && img.path !~ /at_picture/
+        bucket[img.md5] = img
+      end
+      pp images
+      pp bucket
+
+      bucket.values
     end
   end
 
