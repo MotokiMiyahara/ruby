@@ -105,7 +105,9 @@ module Mtk
           raise ArgumentError unless block_given?
           db = Database.new(@data_file)
           db.results_as_hash = true
-          yield db
+          db.transaction do
+            yield db
+          end
         ensure
           db.close
         end
