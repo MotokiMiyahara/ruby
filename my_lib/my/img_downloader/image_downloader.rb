@@ -129,7 +129,7 @@ class MyDownloader
       download_from_url(url, dir)
     end
 
-    ng_list = image_responces.select{|r| [:ng, :too_small].include?(r.status)}.map(&:url)
+    ng_list = image_responces.select{|r| [:ng, :too_small, :not_binary].include?(r.status)}.map(&:url)
     @db.transaction do
       @db[:ng_list] += ng_list
     end
@@ -141,7 +141,8 @@ class MyDownloader
     }
 
   rescue NotDownloadError => e
-puts e.status unless e.status == :exists
+    puts e.status unless e.status == :exists
+    #puts e.status
     return ImageResponse.new(url, e.status)
   rescue *NETWORK_ERRORS => e
     log "#{e.message} (#{e.class}) url=#{url}"
@@ -162,17 +163,15 @@ puts e.status unless e.status == :exists
   def do_download_from_url(url, dir)
     image = calc_image_path(url, dir)
     raise NotDownloadError.new(:exists) if File.exists?(image)
-    #if File.exists?(image)
-    #  return ImageResponse.new(url, :exists)
-    #end
 
     log url
-    body = UriGetter.get_binary(url)
+    body = UriGetter.get_binary(url){|f|
+      #puts f.content_type
+      raise NotDownloadError.new(:not_binary) if f.content_type =~ /^text/i
+      f.read
+    }
     puts body.size
     raise NotDownloadError.new(:too_small) if body.size < DOWNLOAD_MIN_SIZE_BYTE
-    #if body.size < DOWNLOAD_MIN_SIZE_BYTE
-    #  raise NotDownloadError.new(:too_small)
-    #end
 
     write_image(image, body)
     FileUtils.touch(image) if File.exists?(image)

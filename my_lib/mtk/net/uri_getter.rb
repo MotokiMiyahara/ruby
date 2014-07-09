@@ -25,9 +25,15 @@ module Mtk
 
       class <<self
         public
-        def get_binary uri, *rest
-          open_uri(uri, "rb", *rest) do |f|
-            return f.read
+        def get_binary(uri, *rest, &block)
+          if block
+            open_uri(uri, "rb", *rest) do |f|
+              block.call(f)
+            end
+          else
+            open_uri(uri, "rb", *rest) do |f|
+              return f.read
+            end
           end
         end
 
@@ -67,10 +73,10 @@ module Mtk
           #pp opts
           if block.nil?
             meta_io = open(*args, options)
-            return wrap_condent_decoder(meta_io)
+            return wrap_content_decoder(meta_io)
           elsif
             open(*args, options) do |data|
-              block.call(wrap_content_decoder(data))
+              return block.call(wrap_content_decoder(data))
             end
           end
         end
