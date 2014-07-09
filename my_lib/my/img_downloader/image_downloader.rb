@@ -141,8 +141,7 @@ class MyDownloader
     }
 
   rescue NotDownloadError => e
-    puts e.status unless e.status == :exists
-    #puts e.status
+    log "#{e.message} (#{e.class}) url=#{url}" unless e.status == :exists
     return ImageResponse.new(url, e.status)
   rescue *NETWORK_ERRORS => e
     log "#{e.message} (#{e.class}) url=#{url}"
@@ -170,7 +169,6 @@ class MyDownloader
       raise NotDownloadError.new(:not_binary) if f.content_type =~ /^text/i
       f.read
     }
-    puts body.size
     raise NotDownloadError.new(:too_small) if body.size < DOWNLOAD_MIN_SIZE_BYTE
 
     write_image(image, body)
