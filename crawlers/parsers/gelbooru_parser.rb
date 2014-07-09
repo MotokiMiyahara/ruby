@@ -39,6 +39,7 @@ module Crawlers::Parsers
       '-rating:safe',
     ])
 
+
     def initialize(parent, noop)
       @parent = parent
       @noop = noop
@@ -65,16 +66,22 @@ module Crawlers::Parsers
           # 新規
           opt[:news_only] = false
           opt[:news_save] = false
+          opt[:image_count_per_page] = :max
+
         when "append"
           # 追加
           opt[:news_only] = true
           opt[:news_save] = true
+          opt[:image_count_per_page] = :auto
         when "renew"
           # 取りこぼし取得
           opt[:news_only] = false
           opt[:news_save] = true
+          opt[:image_count_per_page] = :max
         end
       }
+
+      # 一ページあたりの画像数
       parser.on("--image_count_per_page=VAL"){|v|
         var = case v
               when /^auto$/i
@@ -84,9 +91,13 @@ module Crawlers::Parsers
               else
                 raise ArgumentError, "image_count_per_page is 'auto' or number"
               end
-        opt[:image_count_per_page] =  var
+        opt[:image_count_per_page] = var
       }
+
+      parser.on("--min_page=VAL"){|v| opt[:min_page] = v.to_i}
       parser.parse command.split(/\s+/)
+
+
       opt[:noop] = @noop
       return opt
     end

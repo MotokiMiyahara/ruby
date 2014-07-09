@@ -3,6 +3,7 @@
 require 'pathname'
 require 'fileutils'
 require 'pp'
+require 'tapp'
 require 'uri'
 require 'timeout'
 
@@ -246,6 +247,11 @@ module Pixiv
       # 公開レベルなどの制限を受けたときは何もしない
       return [] if doc.at_css('span.error')
 
+      if doc.at_css(%q{div.works_display div._ugoku-illust-player-container})
+        # Pixiv動画は未対応
+        return []
+      end
+
       anchor = doc.at_css(%q{div.works_display a[target="_blank"]})
       if anchor
         works_uri = join_uri(base_uri, anchor[:href])
@@ -258,6 +264,14 @@ module Pixiv
         else
         picture = PictureDb::DummyPicture.new
       end
+
+      #puts "base_uri=#{base_uri}"
+      ##puts anchor
+      #puts "works_uri=#{works_uri}"
+      #puts doc.at(%q{div.works_display}),to_s
+      #puts '---------------'
+      #puts
+
 
       picture.illust_id = works_uri.match(/illust_id=(\d+)/)[1]
       picture.tags = scan_tags(doc).join(" ")
@@ -344,19 +358,19 @@ end
 def crawl
   # 巡回設定
   keywords = <<-EOS.split("\n").map(&:strip).reject(&:empty?)
-    艦これ
+    極上の貧乳
   EOS
 
   keywords.each do |keyword|
     pp keyword
     Pixiv::ParallelCrawler.new(
       keyword,
-      min_page: 960,
+      min_page: 1,
       max_page: 5001,
       r18: false,
       #dir: '東方Project',
-      news_only: false,
-      news_save: false,
+      news_only: true,
+      news_save: true,
       db: nil
     ).crawl
   end

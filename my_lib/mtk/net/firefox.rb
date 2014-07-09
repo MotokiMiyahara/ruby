@@ -16,8 +16,9 @@ module Mtk
       attr_reader :cookie
       def initialize
         @cookie = Cookie.new
-        #@user_agent = "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0"
-        @user_agent = 'Mozilla/5.0 (Windows NT 5.1; rv:25.0) Gecko/20100101 Firefox/25.0'
+          #@user_agent = "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20100101 Firefox/21.0"
+          #@user_agent = 'Mozilla/5.0 (Windows NT 5.1; rv:25.0) Gecko/20100101 Firefox/25.0'
+          @user_agent = 'Mozilla/5.0 (Windows NT 5.1; rv:30.0) Gecko/20100101 Firefox/30.0'
 
       end
 
@@ -47,6 +48,11 @@ module Mtk
       def default_options(uri)
         options = {
           'User-Agent' => @user_agent, 
+          #'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          #'Accept-Language'   => 'ja,en-us;q=0.7,en;q=0.3',
+          #'Accept-Encoding'   => 'gzip, deflate',
+          #'Connection'        => 'keep-alive',
+          #'Cache-Control'     => 'max-age=0',
           "Cookie" => @cookie[host_of(uri)]
         }
         return options

@@ -34,13 +34,16 @@ module Gelbooru
     #THREAD_COUNT_DOWNLOAD_IMAGES = 20
     THREAD_COUNT_DOWNLOAD_IMAGES = 10
 
+    MAX_IMAGE_COUNT_PER_PAGE = 200 # max 200(Gelbooru APIの仕様上)
+
     def initialize(
           keyword,
-          news_only: false,
-          news_save: true,
+          news_only:  false,
+          news_save:  true,
           parent_dir: nil,
-          noop:     true,
-          image_count_per_page: :auto # max 200(Gelbooru APIの仕様上)
+          noop:       true,
+          min_page:   0,
+          image_count_per_page: :auto
         )
 
 
@@ -48,6 +51,7 @@ module Gelbooru
       @news_only = news_only
       @news_save = news_save
       @dest_dir = calc_dest_dir(keyword, parent_dir)
+      @min_page = min_page
       @noop = noop
 
       @image_count_per_page = calc_image_count_per_page(image_count_per_page)
@@ -80,7 +84,7 @@ module Gelbooru
     def do_crawl
       max_page = calc_max_page
 
-      (0..max_page).each do |page|
+      (@min_page..max_page).each do |page|
         crawl_page(page)
       end
     rescue CancellError => e
@@ -172,7 +176,9 @@ module Gelbooru
     def calc_image_count_per_page(var)
       case var
       when :auto
-        @dest_dir.exist? ? 30 : 200
+        @dest_dir.exist? ? 30 : MAX_IMAGE_COUNT_PER_PAGE
+      when :max
+        MAX_IMAGE_COUNT_PER_PAGE
       when Integer
         var
       else

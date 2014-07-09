@@ -6,7 +6,7 @@ require 'uri'
 require 'clipboard'
 require 'csv'
 require 'mtk/import'
-require 'mtk/net/firefox'
+#require 'mtk/net/firefox'
 require_relative 'commons'
 require_relative '../config'
 require_relative '../util'
@@ -14,6 +14,7 @@ require_relative '../util'
 #
 require 'httpclient'
 require 'nokogiri'
+
 
 
 module Scripts; end
@@ -50,11 +51,10 @@ if $0 == __FILE__
   script_header
   image_filename = ARGV[0]
   Scripts::SearchImageDetail::execute(image_filename)
-ensure
-  puts 'Hit any key.'
-  gets
+#ensure
+#  puts 'Hit any key.'
+#  gets STDIN.gets
+  end
 end
-end
-
 
 
