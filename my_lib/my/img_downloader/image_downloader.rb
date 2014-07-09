@@ -32,9 +32,8 @@ class MyDownloader
   DEST_DIR = My::CONFIG::dest_dir + 'crawler/2ch'
 
   TIME_OUT = 10
-  #THREAD_COUNT_IMAGE_DOWNLOAD = 50
-  #THREAD_COUNT_IMAGE_DOWNLOAD = 10
   THREAD_COUNT_IMAGE_DOWNLOAD = 5
+  DOWNLOAD_MIN_SIZE_BYTE = 5000
 
   NETWORK_ERRORS = [
       TimeoutError,
@@ -42,6 +41,7 @@ class MyDownloader
       OpenURI::HTTPError,
       Errno::ECONNRESET,
       Errno::EHOSTUNREACH,
+      Errno::ECONNREFUSED,
   ].freeze
 
   private
@@ -129,7 +129,7 @@ class MyDownloader
       download_from_url(url, dir)
     end
 
-    ng_list = image_responces.select{|r| r.status == :ng}.map(&:url)
+    ng_list = image_responces.select{|r| [:ng, :too_small].include?(r.status)}.map(&:url)
     @db.transaction do
       @db[:ng_list] += ng_list
     end
@@ -139,6 +139,10 @@ class MyDownloader
     timeout(TIME_OUT) {
       return do_download_from_url(url, dir)
     }
+
+  rescue NotDownloadError => e
+puts e.status unless e.status == :exists
+    return ImageResponse.new(url, e.status)
   rescue *NETWORK_ERRORS => e
     log "#{e.message} (#{e.class}) url=#{url}"
     #add_to_ng_list(url)
@@ -149,6 +153,7 @@ class MyDownloader
       # add_to_ng_list(url)
       return ImageResponse.new(url, :ng)
     else
+      log "#{e.message} (#{e.class}) url=#{url}"
       pp e.backtrace
       return ImageResponse.new(url, :program_error)
     end
@@ -156,12 +161,19 @@ class MyDownloader
 
   def do_download_from_url(url, dir)
     image = calc_image_path(url, dir)
-    if File.exists?(image)
-      return ImageResponse.new(url, :exists)
-    end
+    raise NotDownloadError.new(:exists) if File.exists?(image)
+    #if File.exists?(image)
+    #  return ImageResponse.new(url, :exists)
+    #end
 
     log url
     body = UriGetter.get_binary(url)
+    puts body.size
+    raise NotDownloadError.new(:too_small) if body.size < DOWNLOAD_MIN_SIZE_BYTE
+    #if body.size < DOWNLOAD_MIN_SIZE_BYTE
+    #  raise NotDownloadError.new(:too_small)
+    #end
+
     write_image(image, body)
     FileUtils.touch(image) if File.exists?(image)
     return ImageResponse.new(url, :ok)
@@ -228,6 +240,14 @@ class ImageResponse
   def initialize(url, status)
     @url = url
     @status = status # :ok, :ng, :exists, :program_error
+  end
+end
+
+class NotDownloadError < StandardError
+  attr_reader :status
+  def initialize(status, *args)
+    super(*args)
+    @status = status
   end
 end
 
