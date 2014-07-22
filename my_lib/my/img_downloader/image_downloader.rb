@@ -91,7 +91,7 @@ class MyDownloader
 
   def download_from_doc(text)
     title = extract_title(text)
-    p title
+    puts title
     urls = extract_image_urls(text)
 
     dir = DEST_DIR.join(fix_basename(title))
@@ -141,7 +141,7 @@ class MyDownloader
     }
 
   rescue NotDownloadError => e
-    log "#{e.message} (#{e.class}) url=#{url}" unless e.status == :exists
+    log "#{e.message} (#{e.status}) url=#{url}" unless e.status == :exists
     return ImageResponse.new(url, e.status)
   rescue *NETWORK_ERRORS => e
     log "#{e.message} (#{e.class}) url=#{url}"
@@ -191,6 +191,10 @@ class MyDownloader
     result = basename.dup
     result.gsub!(%r{[\\/:*?"<>|]}, '')
     result.gsub!(/\s|　/, '_')
+    result.gsub!("\u2014", '') # '―'
+    result.sub!(/^_+/, '')
+    result.sub!(/_+$/, '')
+    result = 'unknown' if result.empty?
     return result
   end
 
