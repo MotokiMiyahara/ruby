@@ -192,9 +192,13 @@ class MyDownloader
     result.gsub!(%r{[\\/:*?"<>|]}, '')
     result.gsub!(/\s|　/, '_')
     result.gsub!("\u2014", '') # '―'
+    result.gsub!("\u301c", '_') #'～'
     result.sub!(/^_+/, '')
     result.sub!(/_+$/, '')
     result = 'unknown' if result.empty?
+
+    #ch = result.chars[8]
+    #pp ch.ord.to_s(16)
     return result
   end
 
