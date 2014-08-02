@@ -23,3 +23,7 @@ tags
 .yardoc
 _yardoc
 doc/
+
+# tmp files and logs
+*.sz7
+nodup.log
