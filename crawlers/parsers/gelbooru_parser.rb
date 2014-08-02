@@ -95,6 +95,7 @@ module Crawlers::Parsers
       }
 
       parser.on("--min_page=VAL"){|v| opt[:min_page] = v.to_i}
+      parser.on("--max_page=VAL"){|v| opt[:max_page] = v.to_i}
       parser.parse command.split(/\s+/)
 
 

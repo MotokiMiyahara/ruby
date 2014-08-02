@@ -43,6 +43,7 @@ module Gelbooru
           parent_dir: nil,
           noop:       true,
           min_page:   0,
+          max_page:   nil,
           image_count_per_page: :auto
         )
 
@@ -52,6 +53,7 @@ module Gelbooru
       @news_save = news_save
       @dest_dir = calc_dest_dir(keyword, parent_dir)
       @min_page = min_page
+      @max_page = max_page
       @noop = noop
 
       @image_count_per_page = calc_image_count_per_page(image_count_per_page)
@@ -82,7 +84,7 @@ module Gelbooru
     end
 
     def do_crawl
-      max_page = calc_max_page
+      max_page = [@max_page, fetch_max_page].compact.min
 
       (@min_page..max_page).each do |page|
         crawl_page(page)
@@ -127,7 +129,7 @@ module Gelbooru
       end
     end
 
-    def calc_max_page
+    def fetch_max_page
       image_count = fetch_image_count
       page_count = image_count.quo(@image_count_per_page).ceil
       max_page = page_count - 1
