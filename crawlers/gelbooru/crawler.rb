@@ -210,13 +210,14 @@ end
 def crawl(keyword)
   Gelbooru::Crawler.new(
     keyword,
-    news_only: true
+    news_only: true,
+    noop: false
   ).crawl
 end
 
 KEYWORDS = [
   'nude_filter',
-  'smile nipples pussy -amputee -nude_filter',
+  #'smile nipples pussy -amputee -nude_filter',
 ]
 
 if $0 == __FILE__ 

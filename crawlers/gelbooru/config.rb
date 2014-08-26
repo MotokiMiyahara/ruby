@@ -2,6 +2,7 @@
 
 require 'my/config'
 require_relative '../errors'
+require_relative '../config'
 require 'uri'
 require 'pp'
 
