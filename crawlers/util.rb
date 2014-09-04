@@ -156,7 +156,7 @@ module Crawlers::Util::Helpers::Files
   def random_sleep(sec)
       random_factor = rand(0.5 .. 1.5)
       sleep_sec = sec * random_factor
-      puts "sleep #{sleep_sec} sec"
+      log "sleep #{sleep_sec} sec"
       sleep(sleep_sec)
   end
 
