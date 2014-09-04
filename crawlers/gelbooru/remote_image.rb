@@ -105,7 +105,7 @@ module Gelbooru
 
       def fetch_image(uri, file)
         log uri 
-        binary = retry_fetch(message: uri) {
+        binary = retry_fetch_with_timelag(message: uri) {
           #@firefox.get_binary(uri, 'Referer' => referer)
           @firefox.get_binary(uri)
         }
