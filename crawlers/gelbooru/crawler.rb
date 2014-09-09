@@ -112,10 +112,7 @@ module Gelbooru
       posts = doc.css('posts post')
       remote_images = posts.map{|post|
         RemoteImage.new(
-          post[:id],
-          post[:file_url],
-          post[:tags],
-          @dest_dir, @news_save, @firefox)
+          post, @dest_dir, @news_save, @firefox)
       }
 
       #pp remote_images
