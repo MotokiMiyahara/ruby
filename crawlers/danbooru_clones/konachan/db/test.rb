@@ -4,11 +4,10 @@ require 'pp'
 
 
 if $0 == __FILE__
-  #Images.connection.execute("TRUNCATE TABLE images;")
-  #Images.new(parent_id: 222222, created_at_on_gelbooru: "Mon Sep 08 11:25:39 -0500 2014").save!
-
+  KonachanImages.connection.execute("TRUNCATE TABLE konachan_images;")
+  KonachanImages.new.save!
 
   # レコード取得
-  pp Images.all
+  pp KonachanImages.all
 end
 

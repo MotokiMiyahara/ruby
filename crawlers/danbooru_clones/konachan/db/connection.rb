@@ -8,7 +8,7 @@ ActiveRecord::Base.establish_connection(
   host:     "localhost",
   username: "root",
   password: "admin99",
-  database: "gelbooru_development",
+  database: "crawlers_development",
 )
 
 
