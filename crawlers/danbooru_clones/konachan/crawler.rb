@@ -14,8 +14,8 @@ require 'my/config'
 require 'mtk/util'
 require 'mtk/net/firefox'
 
-require_relative '../util'
-require_relative '../errors'
+require_relative '../../util'
+require_relative '../../errors'
 require_relative 'config'
 require_relative 'remote_image'
 
