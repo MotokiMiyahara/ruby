@@ -25,13 +25,10 @@ module Konachan
   # オプション引数の説明
   #   news_modeが真のとき
   #     1.保存する対象の画像がすでにあった場合、以降の巡回をすべて中止します
-  #     2.新規に保存した画像へのハードリンクをnewsディレクトリに追加します
   class Crawler
     include Crawlers::Util
 
     VERBOSE = false
-    #THREAD_COUNT_DOWNLOAD_IMAGES = 200
-    #THREAD_COUNT_DOWNLOAD_IMAGES = 20
     THREAD_COUNT_DOWNLOAD_IMAGES = 10
 
     MAX_IMAGE_COUNT_PER_PAGE = 100 # max 200(Konachan APIの仕様上)
@@ -42,7 +39,7 @@ module Konachan
           news_save:  true,
           parent_dir: nil,
           noop:       true,
-          min_page:   0,
+          min_page:   1,
           max_page:   nil,
           image_count_per_page: :auto
         )
@@ -97,16 +94,13 @@ module Konachan
       log "index: page=#{page} #{ident_message}"
 
       q = {
-        page:  'dapi',
-        s:     'post',
-        q:     'index',
         tags:  @keyword,
         limit: @image_count_per_page,
-        pid:   page,
+        page:   page,
       }
 
       query = URI.encode_www_form(q)
-      uri = "http://gelbooru.com/index.php?#{query}"
+      uri = "http://konachan.com/post.xml?#{query}"
       doc = get_document(uri)
 
       posts = doc.css('posts post')
@@ -129,23 +123,19 @@ module Konachan
     def fetch_max_page
       image_count = fetch_image_count
       page_count = image_count.quo(@image_count_per_page).ceil
-      max_page = page_count - 1
+      #max_page = page_count - 1
+      max_page = page_count
       return max_page
     end
 
     def fetch_image_count
       q = {
-        page:  'dapi',
-        s:     'post',
-        q:     'index',
         tags:  @keyword,
-        #limit: 0,
         limit: 1,
-        pid:   0,
       }
 
       query = URI.encode_www_form(q)
-      uri = "http://gelbooru.com/index.php?#{query}"
+      uri = "http://konachan.com/post.xml?#{query}"
       log "api-uri='#{uri}'"
 
       retry_fetch do
@@ -205,15 +195,16 @@ end
 
 
 def crawl(keyword)
-  Gelbooru::Crawler.new(
+  Konachan::Crawler.new(
     keyword,
     news_only: true,
-    noop: false
+    noop: false,
+    max_page: 2
   ).crawl
 end
 
 KEYWORDS = [
-  'nude_filter',
+  'topless',
   #'smile nipples pussy -amputee -nude_filter',
 ]
 
