@@ -5,7 +5,8 @@ require 'pathname'
 
 module Crawlers
   class Config
-    USER_CONFIG_FILE = Pathname("#{ENV['HOME']}/.mtk/my/app/crawlers/config.rb")
+    USER_CONFIG_DIR = Pathname("#{ENV['HOME']}/.mtk/crawlers/")
+    USER_CONFIG_FILE = USER_CONFIG_DIR + "config.rb"
 
     class << self
       def app_dir
@@ -30,6 +31,11 @@ module Crawlers
         #Pathname('C:/Documents and Settings/mtk/デスクトップ/keep')
         app_dir.join('keep')
       end
+
+      def database_yml
+        USER_CONFIG_DIR + ('database.yml')
+      end
+
 
       def make_dirs
         save_dir.mkdir unless save_dir.exist?
