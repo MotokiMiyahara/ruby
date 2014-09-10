@@ -20,7 +20,7 @@ require_relative 'config'
 require_relative 'remote_image'
 
 
-module Gelbooru
+module Konachan
 
   # オプション引数の説明
   #   news_modeが真のとき
@@ -34,7 +34,7 @@ module Gelbooru
     #THREAD_COUNT_DOWNLOAD_IMAGES = 20
     THREAD_COUNT_DOWNLOAD_IMAGES = 10
 
-    MAX_IMAGE_COUNT_PER_PAGE = 200 # max 200(Gelbooru APIの仕様上)
+    MAX_IMAGE_COUNT_PER_PAGE = 100 # max 200(Konachan APIの仕様上)
 
     def initialize(
           keyword,

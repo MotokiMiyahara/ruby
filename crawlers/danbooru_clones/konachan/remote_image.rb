@@ -5,7 +5,7 @@ require 'cgi'
 require 'pathname'
 #require_relative 'db'
 
-module Gelbooru
+module Konachan
   class Crawler
     class RemoteImage
       include Crawlers::Util
