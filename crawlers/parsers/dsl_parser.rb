@@ -39,7 +39,9 @@ module Crawlers::Parsers
         #YandereParser.new(self, @yandere_pool).parse(lines)
         YandereParser.new(self).parse(lines)
       when /^:gelbooru/
-        GelbooruParser.new(self, @noop).parse(lines)
+        DanbooruClones::GelbooruParser.new(self, @noop).parse(lines)
+      when /^:konachan/
+        DanbooruClones::KonachanParser.new(self, @noop).parse(lines)
       when /^:include/
         IncludeParser.new(self, @file, **@opts).parse(lines)
       else
