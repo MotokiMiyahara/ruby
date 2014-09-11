@@ -101,6 +101,7 @@ module Konachan
 
       query = URI.encode_www_form(q)
       uri = "http://konachan.com/post.xml?#{query}"
+
       doc = get_document(uri)
 
       posts = doc.css('posts post')
@@ -203,12 +204,13 @@ def crawl(keyword)
   ).crawl
 end
 
-KEYWORDS = [
-  'topless',
-  #'smile nipples pussy -amputee -nude_filter',
-]
 
 if $0 == __FILE__ 
+  KEYWORDS = [
+    'topless',
+    #'smile nipples pussy -amputee -nude_filter',
+  ]
+
   tlog('start')
   KEYWORDS.each do |keyword|
     crawl(keyword)
