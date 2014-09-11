@@ -158,9 +158,7 @@ module Konachan
 
       def fetch_image(uri, file)
         log uri 
-        #binary = retry_fetch_with_timelag(message: uri) {
         binary = retry_fetch_with_timelag(message: uri + "  (#{@id})") {
-          #@firefox.get_binary(uri, 'Referer' => referer)
           @firefox.get_binary(uri)
         }
         write_binary_quietly(file, binary)
