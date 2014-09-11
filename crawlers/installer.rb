@@ -7,6 +7,7 @@ require_relative 'pixiv/constants'
 require_relative 'moeren/config'
 require_relative 'yande.re/crawler'
 require_relative 'gelbooru/config'
+require_relative 'danbooru_clones/konachan/config'
 
 def main
   puts "You want to make dir? [Y/n]  (#{Crawlers::Config.app_dir})"
@@ -33,6 +34,12 @@ def main
     Gelbooru::ALL_IMAGE_DIR,
     Gelbooru::NEWS_DIR,
     Gelbooru::SEARCH_DIR,
+
+
+    Konachan::SITE_DIR,
+    Konachan::ALL_IMAGE_DIR,
+    Konachan::NEWS_DIR,
+    Konachan::SEARCH_DIR,
   ]
 
   dirs.each do |dir|

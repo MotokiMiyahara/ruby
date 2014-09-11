@@ -1,12 +1,13 @@
 # vim:set fileencoding=utf-8:
 
-#require'tapp'
+require'tapp'
 require 'mtk/import'
-require_relative '../gelbooru/crawler'
-require_relative '../util'
-require_relative 'commons/dired_parser'
 
-module Crawlers::Parsers
+require_relative 'modules'
+#require_relative '../../../util'
+require_relative '../../commons/dired_parser'
+
+module Crawlers::Parsers::DanbooruClones::Core
 
   module Helper
     module_function
@@ -30,7 +31,7 @@ module Crawlers::Parsers
     end
   end
 
-  class GelbooruParser
+  class AbstractParser
     COMMON_KEYWORD = '-photo'
     EXTRA_KEYWORDS = Helper::expand_exclusive_keywords([
       'pussy',
@@ -49,7 +50,7 @@ module Crawlers::Parsers
     def parse(lines)
 
       opt = parseOption(lines.shift.text)
-      items = Commons::DiredParser.new.parse(lines)
+      items = Crawlers::Parsers::Commons::DiredParser.new.parse(lines)
       items = expand_items(items)
 
       crawl(opt, items)
@@ -86,6 +87,8 @@ module Crawlers::Parsers
         var = case v
               when /^auto$/i
                 :auto
+              when /^max$/i
+                :max
               when /\d+/
                 v.to_i
               else
@@ -113,7 +116,7 @@ module Crawlers::Parsers
         
         expanded_items = EXTRA_KEYWORDS.map{|extra_keyword|
           new_keyword = [base_keyword, extra_keyword, COMMON_KEYWORD].join(' ')
-          Commons::DiredParser::Item.new(new_categores, new_keyword)
+          Crawlers::Parsers::Commons::DiredParser::Item.new(new_categores, new_keyword)
         }
 
         next expanded_items
@@ -123,41 +126,48 @@ module Crawlers::Parsers
 
     def crawl(opt, items)
       items.each do |item|
-        do_crawl(item.keyword, item.dir.parent, opt)
+        do_crawl(item.keyword, opt.merge({parent_dir: item.dir.parent}))
       end
     end
 
-    def do_crawl(keyword, parent_dir, opt)
-      @parent.add_invoker(Invoker.new(keyword, opt.merge({parent_dir: parent_dir})))
+    def do_crawl(keyword, opt)
+      invoker = create_invoker(keyword, opt)
+      @parent.add_invoker(invoker)
     end
 
-    class Invoker
-      include Crawlers::Util
-      attr_reader :keyword
+    def create_invoker(keyword, opt)
+      raise 'abstract method'
+      # exsample
+      #   return XxxxInvoker.new(keyword, opt)
+    end
 
-      def initialize  keyword, opt
-        @keyword = keyword
-        @opt = opt
-      end
-        
-      def type
-        return :gelbooru
-      end
 
-      def search_dir
-        raise 'not implemented.'
-        #dir_descend = @opt[:parent_dir].to_pathname.descend.map(&:basename) << @keyword
-        #return dir_descend.map{|d| fix_basename(d.to_s)}.join('/').sub(%r{^/}, '')
-      end
+  end
 
-      def invoke
-        #pp [@keyword, @opt]
-        
-        Gelbooru::Crawler.new(
-          @keyword,
-          @opt
-        ).crawl
-      end
+  class AbstractInvoker
+    #include Crawlers::Util
+    attr_reader :keyword
+
+    def initialize(keyword, opt)
+      @keyword = keyword
+      @opt = opt
+    end
+
+    def search_dir
+      raise 'not implemented.'
+    end
+
+    def type
+      raise 'abstract method'
+    end
+
+    def invoke
+      raise 'abstract method'
+    end
+
+    private
+    def opt
+      return @opt
     end
   end
 end

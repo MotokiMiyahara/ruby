@@ -27,9 +27,11 @@ class Scripts::ViewInPixiv
         # pixiv
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
-      #when /^gelbooru_(\d+)_/
       when /^gelbooru_(\d+)/
         "http://gelbooru.com/index.php?page=post&s=view&id=#{$1}"
+
+      when /^konachan_(\d+)/
+        "http://konachan.com/post/show/#{$1}/"
 
       when /^(\d+)(?:_big_p\d+)?\.\w+/
         # maybe pixiv

@@ -26,7 +26,7 @@ module Crawlers::Parsers
     def parse_invokers
       env = Env.new
       parser = DslParser.new(env, @opts)
-      parser.parse_file # parse_fileすることで@invokersにコマンドが蓄積される
+      parser.parse_file # parse_fileすることでenv#invokersにコマンドが蓄積される
       return env.invokers
     end
 
