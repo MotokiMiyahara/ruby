@@ -16,24 +16,24 @@ require 'mtk/net/firefox'
 
 require_relative '../../util'
 require_relative '../../errors'
-require_relative 'config'
-require_relative 'remote_image'
+require_relative 'modules'
 
 
-module Konachan
+module Crawlers::DanbooruClones::Core
 
   # オプション引数の説明
   #   news_modeが真のとき
   #     1.保存する対象の画像がすでにあった場合、以降の巡回をすべて中止します
-  class Crawler
+  class AbstractCrawler
     include Crawlers::Util
 
-    VERBOSE = false
     THREAD_COUNT_DOWNLOAD_IMAGES = 10
 
-    MAX_IMAGE_COUNT_PER_PAGE = 100 # max 200(Konachan APIの仕様上)
+    # to do
+    MAX_IMAGE_COUNT_PER_PAGE = 100 # max 100(Konachan APIの仕様上) 
 
     def initialize(
+          config,
           keyword,
           news_only:  false,
           news_save:  true,
@@ -44,6 +44,7 @@ module Konachan
           image_count_per_page: :auto
         )
 
+      @config = config
 
       @keyword = keyword
       @news_only = news_only
@@ -106,8 +107,7 @@ module Konachan
 
       posts = doc.css('posts post')
       remote_images = posts.map{|post|
-        RemoteImage.new(
-          post, @dest_dir, @news_save, @firefox)
+        create_remote_image(post)
       }
 
       #pp remote_images
@@ -149,7 +149,7 @@ module Konachan
 
     def calc_dest_dir(keyword, rerative_parent_dir)
       rerative_parent_dir ||= Pathname('.')
-      dest_dir = SEARCH_DIR + rerative_parent_dir + calc_dest_dir_basename
+      dest_dir = @config.search_dir + rerative_parent_dir + calc_dest_dir_basename
       return dest_dir
     end
 
@@ -188,33 +188,21 @@ module Konachan
     def ident_message
       return "keyword='#{@keyword}'"
     end
+
+    # ---------------------------------
+    def create_remote_image(post)
+      return remote_image_class.new(post, @dest_dir, @news_save, @firefox, @config)
+    end
+
+    # @abstract
+    def remote_image_class
+      raise 'abstract method'
+    end
   end
 
   class CancellError < Exception; end
-  #class OutOfIndexError < CancellError; end
 end
 
 
-def crawl(keyword)
-  Konachan::Crawler.new(
-    keyword,
-    news_only: true,
-    noop: false,
-    max_page: 2
-  ).crawl
-end
 
-
-if $0 == __FILE__ 
-  KEYWORDS = [
-    'topless',
-    #'smile nipples pussy -amputee -nude_filter',
-  ]
-
-  tlog('start')
-  KEYWORDS.each do |keyword|
-    crawl(keyword)
-  end
-  tlog('end')
-end
 

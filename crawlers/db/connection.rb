@@ -3,7 +3,7 @@
 require 'active_record'
 require 'yaml'
 
-require_relative '../../../config'
+require_relative '../config'
 
 # DB接続設定
 #ActiveRecord::Base.establish_connection(
