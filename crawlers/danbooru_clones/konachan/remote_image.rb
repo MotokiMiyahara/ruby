@@ -3,7 +3,6 @@
 require 'uri'
 require 'cgi'
 require 'pathname'
-#require_relative 'db'
 
 module Konachan
   class Crawler
@@ -33,7 +32,6 @@ module Konachan
         #puts @news_file
         #puts @model.save_path
         #raise
-
       end
 
       def get_model(xml_doc)
@@ -62,7 +60,7 @@ module Konachan
 
         model = KonachanImages.new(h_model)
         model.save_path = calc_save_path(id, model.file_url).to_s
-        model.save!
+        raise unless model.save
         return model
       end
 
