@@ -44,17 +44,23 @@ module Konachan
         end
 
         # active_recordが生成すると衝突するカラム名を変更する
-        diffs = [
+        renames = [
           [:o_id, :id],
         ]
 
+        excepts = [
+          :created_at,
+          :updated_at,
+          :save_path,
+        ]
+
         h_model = {}
-        attrs = KonachanImages.attribute_names.map(&:to_sym) - diffs.flatten - [:save_path]
+        attrs = KonachanImages.attribute_names.map(&:to_sym) - renames.flatten - excepts
         attrs.each do |a|
           h_model[a] = xml_doc[a]
         end
 
-        diffs.each do |dest, src|
+        renames.each do |dest, src|
           h_model[dest] = xml_doc[src]
         end
 
@@ -71,9 +77,10 @@ module Konachan
         raise 'not match' unless mdata
 
         sub_dir = mdata.to_a[1]
-        save_path = File.join(uri.host, sub_dir)
+        save_path = Pathname(uri.host).join(sub_dir).cleanpath
+        raise "Unsafe path: #{save_path}" unless safe_path?(save_path)
 
-        return calc_pathname_in_dir(id, uri, sub_dir)
+        return calc_pathname_in_dir(id, uri, save_path)
       end
       private :calc_save_path
 
@@ -105,6 +112,15 @@ module Konachan
         place = needs_place ? "@#{@dest_dir.basename}" : ''
         file = dir.join("#{PREFIX}_#{id}#{place}#{ext}")
         return file
+      end
+
+
+      # @param [Pathname] path
+      def safe_path?(path)
+        str = path.cleanpath.to_s
+        return false if str.start_with?('/')
+        return false if str.start_with?('..')
+        return true
       end
 
       def download
