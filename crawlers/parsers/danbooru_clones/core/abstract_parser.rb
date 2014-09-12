@@ -79,6 +79,8 @@ module Crawlers::Parsers::DanbooruClones::Core
           opt[:news_only] = false
           opt[:news_save] = true
           opt[:image_count_per_page] = :max
+        else
+          raise "wrong type: #{v}"
         end
       }
 
@@ -99,7 +101,7 @@ module Crawlers::Parsers::DanbooruClones::Core
 
       parser.on("--min_page=VAL"){|v| opt[:min_page] = v.to_i}
       parser.on("--max_page=VAL"){|v| opt[:max_page] = v.to_i}
-      parser.parse command.split(/\s+/)
+      parser.parse(command.split(/\s+/))
 
 
       opt[:noop] = @noop
