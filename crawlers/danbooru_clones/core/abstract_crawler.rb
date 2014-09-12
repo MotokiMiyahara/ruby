@@ -60,6 +60,7 @@ module Crawlers::DanbooruClones::Core
       @dest_dir.mkpath unless @noop || @dest_dir.exist?
     end
 
+    # サブクラス用の定義--------
 
 
     public
