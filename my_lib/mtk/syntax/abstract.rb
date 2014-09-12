@@ -7,11 +7,12 @@ module Mtk::Syntax::Abstract
     def def_abstract(*method_names)
       method_names.each do |name|
         define_method(name) {|*args|
-          raise "'#{name}' is abstract method."
+          raise "[#{self.class.name}##{name}] is not implemented. <abstract_method>"
         }
       end
     end
   end
+
 end
 
 
