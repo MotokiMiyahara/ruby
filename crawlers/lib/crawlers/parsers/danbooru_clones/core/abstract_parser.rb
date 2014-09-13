@@ -32,7 +32,7 @@ module Crawlers::Parsers::DanbooruClones::Core
   end
 
   class AbstractParser
-    COMMON_KEYWORD = '-photo'
+    COMMON_KEYWORD = '-photo -animated '
     EXTRA_KEYWORDS = Helper::expand_exclusive_keywords([
       'pussy',
       'nipples',
