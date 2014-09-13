@@ -1,0 +1,103 @@
+PATH
+  remote: .
+  specs:
+    crawlers (0.0.1)
+      activerecord
+      archive-tar-minitar
+      clipboard
+      ffi
+      httpclient
+      mechanize
+      mysql
+      nokogiri
+      parallel
+      sequel
+      sqlite3-ruby
+      tapp
+      win32-shortcut
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (4.1.6)
+      activesupport (= 4.1.6)
+      builder (~> 3.1)
+    activerecord (4.1.6)
+      activemodel (= 4.1.6)
+      activesupport (= 4.1.6)
+      arel (~> 5.0.0)
+    activesupport (4.1.6)
+      i18n (~> 0.6, >= 0.6.9)
+      json (~> 1.7, >= 1.7.7)
+      minitest (~> 5.1)
+      thread_safe (~> 0.1)
+      tzinfo (~> 1.1)
+    archive-tar-minitar (0.5.2)
+    arel (5.0.1.20140414130214)
+    builder (3.2.2)
+    clipboard (1.0.5)
+    diff-lcs (1.2.5)
+    domain_name (0.5.21)
+      unf (>= 0.0.5, < 1.0.0)
+    ffi (1.9.3)
+    http-cookie (1.0.2)
+      domain_name (~> 0.5)
+    httpclient (2.4.0)
+    i18n (0.6.11)
+    json (1.8.1)
+    mechanize (2.7.3)
+      domain_name (~> 0.5, >= 0.5.1)
+      http-cookie (~> 1.0)
+      mime-types (~> 2.0)
+      net-http-digest_auth (~> 1.1, >= 1.1.1)
+      net-http-persistent (~> 2.5, >= 2.5.2)
+      nokogiri (~> 1.4)
+      ntlm-http (~> 0.1, >= 0.1.1)
+      webrobots (>= 0.0.9, < 0.2)
+    mime-types (2.3)
+    mini_portile (0.6.0)
+    minitest (5.4.1)
+    mysql (2.9.1)
+    net-http-digest_auth (1.4)
+    net-http-persistent (2.9.4)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
+    ntlm-http (0.1.1)
+    parallel (1.3.2)
+    rake (10.3.2)
+    rspec (3.1.0)
+      rspec-core (~> 3.1.0)
+      rspec-expectations (~> 3.1.0)
+      rspec-mocks (~> 3.1.0)
+    rspec-core (3.1.2)
+      rspec-support (~> 3.1.0)
+    rspec-expectations (3.1.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.1.0)
+    rspec-mocks (3.1.0)
+      rspec-support (~> 3.1.0)
+    rspec-support (3.1.0)
+    sequel (4.14.0)
+    sqlite3 (1.3.9)
+    sqlite3-ruby (1.3.3)
+      sqlite3 (>= 1.3.3)
+    tapp (1.4.1)
+      thor
+    thor (0.19.1)
+    thread_safe (0.3.4)
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.6)
+    webrobots (0.1.1)
+    win32-shortcut (0.2.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.6)
+  crawlers!
+  rake
+  rspec
