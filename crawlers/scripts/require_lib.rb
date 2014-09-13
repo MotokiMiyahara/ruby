@@ -5,7 +5,7 @@ require 'pathname'
 module Scripts
   module LibLoader
 
-    LIB_PATH = File.expand_path('../lib', __dir__)
+    LIB_PATH = File.expand_path('../lib/crawlers', __dir__)
     module_function
     def require_lib(path)
       require File.expand_path(path, LIB_PATH)
