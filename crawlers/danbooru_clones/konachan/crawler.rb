@@ -26,9 +26,41 @@ module Konachan
       super(Konachan::Config, *args)
     end
 
+    def page_offset
+      return 1
+    end
+
+    def max_image_count_per_page
+      # max 100(Konachan APIの仕様上) 
+      return 100
+    end
+
     def remote_image_class
       return RemoteImage
     end
+
+    def page_count_uri
+      q = {
+        tags:  keyword,
+        limit: 1,
+      }
+
+      query = URI.encode_www_form(q)
+      return URI("http://konachan.com/post.xml?#{query}")
+    end
+
+    def page_uri(page)
+      q = {
+        tags:  keyword,
+        limit: image_count_per_page,
+        page:  page,
+      }
+
+      query = URI.encode_www_form(q)
+      return URI("http://konachan.com/post.xml?#{query}")
+    end
+
+
   end
 end
 

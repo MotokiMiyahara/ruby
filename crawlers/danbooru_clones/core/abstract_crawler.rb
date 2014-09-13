@@ -14,6 +14,7 @@ require 'my/config'
 require 'mtk/util'
 require 'mtk/net/firefox'
 
+require 'mtk/syntax'
 require_relative '../../util'
 require_relative '../../errors'
 require_relative 'modules'
@@ -25,6 +26,7 @@ module Crawlers::DanbooruClones::Core
   #   news_modeが真のとき
   #     1.保存する対象の画像がすでにあった場合、以降の巡回をすべて中止します
   class AbstractCrawler
+    using Mtk::Syntax::Abstract
     include Crawlers::Util
 
     THREAD_COUNT_DOWNLOAD_IMAGES = 10
@@ -39,7 +41,7 @@ module Crawlers::DanbooruClones::Core
           news_save:  true,
           parent_dir: nil,
           noop:       true,
-          min_page:   1,
+          min_page:   0 + page_offset,
           max_page:   nil,
           image_count_per_page: :auto
         )
@@ -61,8 +63,22 @@ module Crawlers::DanbooruClones::Core
     end
 
     # サブクラス用の定義--------
+    private
+    attr_reader :keyword
+    attr_reader :image_count_per_page
+
+    # 最初のページの番号(0 or 1)
+    def_abstract :page_offset
+
+    # 1ページで取得できる最大の件数
+    def_abstract :max_image_count_per_page
+
+    def_abstract :page_count_uri
+    def_abstract :page_uri
+    def_abstract :remote_image_class
 
 
+    # ----------------------------
     public
     def crawl
       if @noop
@@ -83,9 +99,10 @@ module Crawlers::DanbooruClones::Core
     end
 
     def do_crawl
+      min_page = @min_page
       max_page = [@max_page, fetch_max_page].compact.min
 
-      (@min_page..max_page).each do |page|
+      (min_page..max_page).each do |page|
         crawl_page(page)
       end
     rescue CancellError => e
@@ -93,19 +110,12 @@ module Crawlers::DanbooruClones::Core
     end
 
     def crawl_page(page)
+      uri = page_uri(page)
+
       log "index: page=#{page} #{ident_message}"
-
-      q = {
-        tags:  @keyword,
-        limit: @image_count_per_page,
-        page:   page,
-      }
-
-      query = URI.encode_www_form(q)
-      uri = "http://konachan.com/post.xml?#{query}"
+      log "uri: #{uri}"
 
       doc = get_document(uri)
-
       posts = doc.css('posts post')
       remote_images = posts.map{|post|
         create_remote_image(post)
@@ -125,19 +135,13 @@ module Crawlers::DanbooruClones::Core
     def fetch_max_page
       image_count = fetch_image_count
       page_count = image_count.quo(@image_count_per_page).ceil
-      #max_page = page_count - 1
-      max_page = page_count
+      max_page = page_count - 1 + page_offset
       return max_page
     end
 
     def fetch_image_count
-      q = {
-        tags:  @keyword,
-        limit: 1,
-      }
+      uri = page_count_uri
 
-      query = URI.encode_www_form(q)
-      uri = "http://konachan.com/post.xml?#{query}"
       log "api-uri='#{uri}'"
 
       retry_fetch do
@@ -167,9 +171,9 @@ module Crawlers::DanbooruClones::Core
     def calc_image_count_per_page(var)
       case var
       when :auto
-        @dest_dir.exist? ? 30 : MAX_IMAGE_COUNT_PER_PAGE
+        @dest_dir.exist? ? 30 : max_image_count_per_page
       when :max
-        MAX_IMAGE_COUNT_PER_PAGE
+        max_image_count_per_page
       when Integer
         var
       else
@@ -180,7 +184,6 @@ module Crawlers::DanbooruClones::Core
     def get_document(uri, *rest)
       retry_fetch(message: uri) do
         html = @firefox.get_html_as_utf8(uri, *rest)
-        #doc = Nokogiri::HTML(html)
         doc = Nokogiri::XML(html)
         return doc
       end
@@ -195,10 +198,6 @@ module Crawlers::DanbooruClones::Core
       return remote_image_class.new(post, @dest_dir, @news_save, @firefox, @config)
     end
 
-    # @abstract
-    def remote_image_class
-      raise 'abstract method'
-    end
   end
 
   class CancellError < Exception; end

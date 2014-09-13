@@ -4,15 +4,21 @@ require 'uri'
 require 'cgi'
 require 'pathname'
 
+require 'mtk/syntax'
+
 require_relative '../../util'
 
 module Crawlers::DanbooruClones::Core
   class AbstractRemoteImage
+    using Mtk::Syntax::Abstract
     include Crawlers::Util
 
     PREFIX = 'konachan'
 
     attr_reader :search_file
+
+    def_abstract :model_class
+    def_abstract :calc_relative_save_dir # @config.all_image_dir からの相対パス
 
     def initialize(xml_doc, dest_dir, news_save, fire_fox, config)
 
@@ -36,6 +42,7 @@ module Crawlers::DanbooruClones::Core
       #raise
     end
 
+    private
     def get_model(xml_doc)
       id = xml_doc[:id]
 
@@ -73,17 +80,12 @@ module Crawlers::DanbooruClones::Core
 
     def calc_save_path(id, uri)
       uri = URI(uri)
-      reg = %r{/(image/[a-f0-9/]+/)Konachan\.com[-_%a-z0-9]+.[a-z]+}
-      mdata = uri.path.match(reg)
-      raise 'not match' unless mdata
-
-      sub_dir = mdata.to_a[1]
-      save_path = Pathname(uri.host).join(sub_dir).cleanpath
+      save_dir = calc_relative_save_dir(id, uri)
+      save_path =  calc_pathname_in_dir(id, uri, save_dir)
       raise "Unsafe path: #{save_path}" unless safe_path?(save_path)
-
-      return calc_pathname_in_dir(id, uri, save_path)
+      return save_path
     end
-    private :calc_save_path
+
 
     def calc_regular_image_pathname(model)
       result = @config.all_image_dir.join(model.save_path)
@@ -92,18 +94,15 @@ module Crawlers::DanbooruClones::Core
       dir.mkpath unless dir.exist?
       return result
     end
-    private :calc_regular_image_pathname
 
 
     def calc_search_image_pathname(id, uri)
       return calc_pathname_in_dir(id, uri, @dest_dir)
     end
-    private :calc_search_image_pathname
 
     def calc_news_image_pathname(id, uri)
       return calc_pathname_in_dir(id, uri, @config.news_dir, needs_place: true)
     end
-    private :calc_news_image_pathname
 
     def calc_pathname_in_dir(id, uri, dir, needs_place: false)
       uri = URI(uri)
@@ -124,10 +123,13 @@ module Crawlers::DanbooruClones::Core
       return true
     end
 
+    # -----------------------------------------------------
+    public 
     def download
       download_image(@uri)
     end
 
+    private
     def download_image(uri)
       if @search_file.exist?
         log "found search_file #{@search_file}. abort download."
@@ -179,11 +181,6 @@ module Crawlers::DanbooruClones::Core
     end
 
 
-    # ----
-    # @abstract
-    def model_class
-      raise 'abstract_method'
-    end
   end
 
 end

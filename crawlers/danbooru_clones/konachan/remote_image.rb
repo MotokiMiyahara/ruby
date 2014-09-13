@@ -12,6 +12,15 @@ module Konachan
     def model_class
       return KonachanImages
     end
+
+    def calc_relative_save_dir(id, uri)
+      reg = %r{/(image/[a-f0-9/]+/)Konachan\.com[-_%a-z0-9]+.[a-z]+}
+      mdata = uri.path.match(reg)
+      raise 'not match' unless mdata
+
+      sub_dir = mdata.to_a[1]
+      return Pathname(uri.host).join(sub_dir).cleanpath
+    end
   end
 end
 
