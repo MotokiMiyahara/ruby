@@ -4,8 +4,9 @@
 require 'pathname'
 require 'fileutils'
 require 'mtk/import'
-require_relative '../config'
 require_relative 'commons'
+
+require_lib 'config'
 
 module Scripts; end
 class Scripts::CopyAndTouch

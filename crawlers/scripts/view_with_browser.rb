@@ -4,8 +4,9 @@
 require 'pathname'
 require 'fileutils'
 require 'mtk/import'
+
 require_relative 'commons'
-require_relative '../util'
+require_lib 'util'
 
 module Scripts; end
 class Scripts::ViewInPixiv

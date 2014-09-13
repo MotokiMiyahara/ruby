@@ -4,8 +4,9 @@
 require 'pathname'
 require 'fileutils'
 require 'mtk/import'
+
 require_relative 'commons'
-require_relative '../strages/image_store'
+require_lib 'strages/image_store'
 
 module Scripts; end
 

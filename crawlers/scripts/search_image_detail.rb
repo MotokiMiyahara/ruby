@@ -8,14 +8,13 @@ begin
   require 'clipboard'
   require 'csv'
   require 'mtk/import'
-  #require 'mtk/net/firefox'
-  require_relative 'commons'
-  require_relative '../config'
-  require_relative '../util'
-  #require_relative '../pixiv/user_crawler'
-  #
+
   require 'httpclient'
   require 'nokogiri'
+
+  require_relative 'commons'
+  require_lib 'config'
+  require_lib 'util'
 
 
 

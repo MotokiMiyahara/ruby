@@ -3,7 +3,9 @@
 require 'forwardable'
 require 'pathname'
 require 'optparse'
-require_relative '../util'
+
+require_relative 'require_lib'
+require_lib 'util'
 
 module Scripts
   extend self
