@@ -1,2 +1,0 @@
-
-ruby 'moeren/fire.rb'
