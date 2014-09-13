@@ -36,10 +36,10 @@ def main
     Gelbooru::SEARCH_DIR,
 
 
-    Konachan::SITE_DIR,
-    Konachan::ALL_IMAGE_DIR,
-    Konachan::NEWS_DIR,
-    Konachan::SEARCH_DIR,
+    Konachan::Config.site_dir,
+    Konachan::Config.all_image_dir,
+    Konachan::Config.news_dir,
+    Konachan::Config.search_dir,
   ]
 
   dirs.each do |dir|
