@@ -7,7 +7,7 @@ require 'pp'
 
 require_relative '../core'
 
-module Konachan
+module Crawlers::DanbooruClones::Konachan
   class Config < Crawlers::DanbooruClones::Core::AbstractConfig
     class << self
       def site_name
@@ -19,6 +19,6 @@ end
 
 
 if $0 == __FILE__
-  pp Konachan::Config.all_image_dir
+  pp Crawlers::DanbooruClones::Konachan::Config.all_image_dir
 end
 

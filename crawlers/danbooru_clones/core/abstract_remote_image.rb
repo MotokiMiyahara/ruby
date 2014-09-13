@@ -179,8 +179,6 @@ module Crawlers::DanbooruClones::Core
     def make_link_quietly(old, new)
       FileUtils.ln_sf(old, new, verbose: @config.verbose)
     end
-
-
   end
 
 end

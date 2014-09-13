@@ -5,9 +5,9 @@ require 'cgi'
 require 'pathname'
 
 require_relative '../core'
-require_relative 'db'
+require_relative 'models'
 
-module Konachan
+module Crawlers::DanbooruClones::Konachan
   class RemoteImage <  Crawlers::DanbooruClones::Core::AbstractRemoteImage
     def model_class
       return KonachanImages

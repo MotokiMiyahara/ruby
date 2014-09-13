@@ -19,7 +19,7 @@ module Crawlers::Parsers::DanbooruClones
       end
 
       def invoke
-        Konachan::Crawler.new(
+        Crawlers::DanbooruClones::Konachan::Crawler.new(
           keyword,
           opt
         ).crawl
