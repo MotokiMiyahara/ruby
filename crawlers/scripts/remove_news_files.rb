@@ -2,12 +2,13 @@
 # vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
 require 'optparse'
-require_relative '../util'
+
 require_relative 'commons'
-require_relative '../pixiv/config'
-require_relative '../moeren/config'
-require_relative '../yande.re/crawler'
-require_relative '../gelbooru/config'
+require_lib 'util'
+require_lib 'pixiv/config'
+require_lib 'moeren/config'
+require_lib 'yande.re/crawler'
+require_lib 'gelbooru/config'
 
 module Scripts; end
 
