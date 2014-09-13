@@ -2,7 +2,7 @@
 # vim:set fileencoding=utf-8:
 
 require 'optparse'
-require_relative '../parsers'
+require_relative '../lib/parsers'
 
 if $0 == __FILE__
   Thread.abort_on_exception = true

@@ -2,12 +2,12 @@
 # vim:set fileencoding=utf-8:
 # データ保存用のディレクトリを作るだけ
 
-require_relative 'config'
-require_relative 'pixiv/constants'
-require_relative 'moeren/config'
-require_relative 'yande.re/crawler'
-require_relative 'danbooru_clones/konachan/config'
-require_relative 'danbooru_clones/gelbooru/config'
+require_relative '../lib/config'
+require_relative '../lib/pixiv/constants'
+require_relative '../lib/moeren/config'
+require_relative '../lib/yande.re/crawler'
+require_relative '../lib/danbooru_clones/konachan/config'
+require_relative '../lib/danbooru_clones/gelbooru/config'
 
 def main
 
@@ -44,9 +44,6 @@ def main
   dirs.each do |dir|
     dir.mkpath
   end
-
-
-
 
   puts 'finished.'
 end
