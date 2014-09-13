@@ -204,20 +204,22 @@ module Gelbooru
 end
 
 
-def crawl(keyword)
-  Gelbooru::Crawler.new(
-    keyword,
-    news_only: true,
-    noop: false
-  ).crawl
-end
 
-KEYWORDS = [
-  'nude_filter',
-  #'smile nipples pussy -amputee -nude_filter',
-]
 
 if $0 == __FILE__ 
+  def crawl(keyword)
+    Gelbooru::Crawler.new(
+      keyword,
+      news_only: true,
+      noop: false
+    ).crawl
+  end
+
+  KEYWORDS = [
+    'nude_filter',
+    #'smile nipples pussy -amputee -nude_filter',
+  ]
+
   tlog('start')
   KEYWORDS.each do |keyword|
     crawl(keyword)

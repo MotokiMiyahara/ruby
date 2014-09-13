@@ -1,7 +1,7 @@
 # vim:set fileencoding=utf-8:
 
 require_relative 'modules'
-require_relative '../../gelbooru/crawler'
+require_relative '../../danbooru_clones/gelbooru/crawler'
 require_relative 'core'
 
 module Crawlers::Parsers::DanbooruClones
@@ -19,7 +19,7 @@ module Crawlers::Parsers::DanbooruClones
       end
 
       def invoke
-        Gelbooru::Crawler.new(
+        Crawlers::DanbooruClones::Gelbooru::Crawler.new(
           keyword,
           opt
         ).crawl

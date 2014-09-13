@@ -6,10 +6,11 @@ require_relative 'config'
 require_relative 'pixiv/constants'
 require_relative 'moeren/config'
 require_relative 'yande.re/crawler'
-require_relative 'gelbooru/config'
 require_relative 'danbooru_clones/konachan/config'
+require_relative 'danbooru_clones/gelbooru/config'
 
 def main
+
   puts "You want to make dir? [Y/n]  (#{Crawlers::Config.app_dir})"
   reply = gets.chomp
   exit unless reply =~ /^Y/i
@@ -30,16 +31,14 @@ def main
     Yandere::YANDERE_DIR,
     Yandere::NEWS_DIR,
 
-    Gelbooru::SITE_DIR,
-    Gelbooru::ALL_IMAGE_DIR,
-    Gelbooru::NEWS_DIR,
-    Gelbooru::SEARCH_DIR,
-
-
-    Konachan::Config.site_dir,
-    Konachan::Config.all_image_dir,
-    Konachan::Config.news_dir,
-    Konachan::Config.search_dir,
+    *([Gelbooru, Konachan].flat_map{|clazz|
+      [
+        clazz::Config.site_dir,
+        clazz::Config.all_image_dir,
+        clazz::Config.news_dir,
+        clazz::Config.search_dir,
+      ]
+    }),
   ]
 
   dirs.each do |dir|
@@ -53,5 +52,6 @@ def main
 end
 
 if $0 == __FILE__
+  include Crawlers::DanbooruClones
   main
 end

@@ -7,19 +7,19 @@ require 'pathname'
 require_relative '../core'
 require_relative 'models'
 
-module Crawlers::DanbooruClones::Konachan
+module Crawlers::DanbooruClones::Gelbooru
   class RemoteImage <  Crawlers::DanbooruClones::Core::AbstractRemoteImage
 
     def image_filename_prefix
-      return 'konachan'
+      return 'gelbooru'
     end
 
     def model_class
-      return KonachanImages
+      return GelbooruImages
     end
 
     def calc_relative_save_dir(id, uri)
-      reg = %r{/(image/[a-f0-9/]+/)Konachan\.com[-_%a-z0-9]+.[a-z]+}
+      reg = %r{/([a-f0-9/]+)/[a-f0-9]+\.[a-z]+}
       mdata = uri.path.match(reg)
       raise 'not match' unless mdata
 

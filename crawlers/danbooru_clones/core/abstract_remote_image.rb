@@ -13,10 +13,11 @@ module Crawlers::DanbooruClones::Core
     using Mtk::Syntax::Abstract
     include Crawlers::Util
 
-    PREFIX = 'konachan'
+    #PREFIX = 'konachan'
 
     attr_reader :search_file
 
+    def_abstract :image_filename_prefix
     def_abstract :model_class
     def_abstract :calc_relative_save_dir # @config.all_image_dir からの相対パス
 
@@ -110,7 +111,7 @@ module Crawlers::DanbooruClones::Core
       basename = uri.path.split('/')[-1]
       ext = Pathname(basename).extname
       place = needs_place ? "@#{@dest_dir.basename}" : ''
-      file = dir.join("#{PREFIX}_#{id}#{place}#{ext}")
+      file = dir.join("#{image_filename_prefix}_#{id}#{place}#{ext}")
       return file
     end
 
