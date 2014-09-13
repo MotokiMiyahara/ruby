@@ -46,6 +46,7 @@ module Mtk
 
       private
       def default_options(uri)
+        uri = URI(uri)
         options = {
           'User-Agent' => @user_agent, 
           #'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -53,14 +54,9 @@ module Mtk
           #'Accept-Encoding'   => 'gzip, deflate',
           #'Connection'        => 'keep-alive',
           #'Cache-Control'     => 'max-age=0',
-          "Cookie" => @cookie[host_of(uri)]
+          "Cookie" => @cookie[uri.host]
         }
         return options
-      end
-
-      def host_of a_uri
-        uri = URI.parse(a_uri) if a_uri.is_a? String
-        return uri.host
       end
 
       class Cookie
