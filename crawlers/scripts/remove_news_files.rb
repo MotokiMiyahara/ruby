@@ -8,7 +8,8 @@ require_lib 'util'
 require_lib 'pixiv/config'
 require_lib 'moeren/config'
 require_lib 'yande.re/crawler'
-require_lib 'gelbooru/config'
+require_lib 'danbooru_clones/gelbooru/config'
+require_lib 'danbooru_clones/konachan/config'
 
 module Scripts; end
 
@@ -26,7 +27,9 @@ class Scripts::RemveNewsFiles
       when 'yandere'
         Yandere::NEWS_DIR
       when 'gelbooru'
-        Gelbooru::NEWS_DIR
+        Crawlers::DanbooruClones::Gelbooru::Config.news_dir
+      when 'konachan'
+        Crawlers::DanbooruClones::Konachan::Config.news_dir
       else
         raise "wrong type=#{type}"
       end
