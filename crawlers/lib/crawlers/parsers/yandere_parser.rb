@@ -1,6 +1,6 @@
 # vim:set fileencoding=utf-8:
 
-
+require 'shellwords'
 require_relative '../yande.re/crawler'
 
 class YandereParser
@@ -12,14 +12,14 @@ class YandereParser
 
   public
   def parse lines
-    opt = parseOption lines.shift.text
+    opt = parse_option(lines.shift.text)
     keywords = shift_keywords lines
     do_crawl opt, keywords
     @parent.parse lines
   end
 
   private
-  def parseOption command
+  def parse_option(command)
     opt = {}
     parser = OptionParser.new
     parser.on("--type=VAL"){|v|
@@ -41,7 +41,7 @@ class YandereParser
         opt[:news_save] = true
       end
     }
-    parser.parse command.split(/\s+/)
+    parser.parse(Shellwords.split(command))
     return opt
   end
 

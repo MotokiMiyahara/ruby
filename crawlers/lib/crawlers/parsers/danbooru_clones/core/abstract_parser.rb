@@ -1,10 +1,10 @@
 # vim:set fileencoding=utf-8:
 
 require'tapp'
+require 'shellwords'
 require 'mtk/import'
 
 require_relative 'modules'
-#require_relative '../../../util'
 require_relative '../../commons/dired_parser'
 
 module Crawlers::Parsers::DanbooruClones::Core
@@ -49,7 +49,7 @@ module Crawlers::Parsers::DanbooruClones::Core
     public
     def parse(lines)
 
-      opt = parseOption(lines.shift.text)
+      opt = parse_option(lines.shift.text)
       items = Crawlers::Parsers::Commons::DiredParser.new.parse(lines)
       items = expand_items(items)
 
@@ -58,7 +58,7 @@ module Crawlers::Parsers::DanbooruClones::Core
     end
 
     private
-    def parseOption(command)
+    def parse_option(command)
       opt = {}
       parser = OptionParser.new
       parser.on("--type=VAL"){|v|
@@ -101,7 +101,7 @@ module Crawlers::Parsers::DanbooruClones::Core
 
       parser.on("--min_page=VAL"){|v| opt[:min_page] = v.to_i}
       parser.on("--max_page=VAL"){|v| opt[:max_page] = v.to_i}
-      parser.parse(command.split(/\s+/))
+      parser.parse(Shellwords.split(command))
 
 
       opt[:noop] = @noop

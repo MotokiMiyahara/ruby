@@ -1,5 +1,6 @@
 # vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
+require 'shellwords'
 require 'forwardable'
 require 'optparse'
 require_relative '../modules'
@@ -27,7 +28,7 @@ module Crawlers::Parsers
     end
 
     def parseCommandLine(command)
-      args = command.split(/\s+/)[1..-1]
+      args = Shellwords.split(command)[1..-1]
       files = args.map{|f| @parent_file.dirname.join(f)}
       raise ArgumentError, "':include' needs included files" if files.empty?
       return files

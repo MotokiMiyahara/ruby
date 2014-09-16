@@ -1,7 +1,7 @@
 # vim:set fileencoding=utf-8:
 
 require 'mtk/import'
-#require_relative '../pixiv/crawler'
+require 'shellwords'
 require_relative '../pixiv/parallel_cralwler'
 require_relative '../util'
 require_relative 'commons/dired_parser'
@@ -17,14 +17,14 @@ module Crawlers::Parsers
     
     public
     def parse lines
-      opt = parseOption(lines.shift.text)
+      opt = parse_option(lines.shift.text)
       dirs_and_keywords = shift_keywords(lines)
       crawl opt, dirs_and_keywords
       @parent.parse(lines)
     end
 
     private
-    def parseOption(command)
+    def parse_option(command)
       opt = {
         db: @db
       }
@@ -63,7 +63,7 @@ module Crawlers::Parsers
       parser.on("--r18=VAL"){|v| opt[:r18] = (v == "true")}
       parser.on("--min_page=VAL"){|v| opt[:min_page] = v.to_i}
       parser.on("--max_page=VAL"){|v| opt[:max_page] = v.to_i}
-      parser.parse command.split(/\s+/)
+      parser.parse(Shellwords.split(command))
       return opt
     end
 
