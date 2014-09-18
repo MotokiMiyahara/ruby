@@ -3,7 +3,7 @@
 require 'optparse'
 require 'pp'
 
-require_relative '../pixiv/picture'
+#require_relative '../pixiv/picture'
 require_relative 'modules'
 
 module Crawlers::Parsers

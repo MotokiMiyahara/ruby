@@ -48,12 +48,11 @@ module Crawlers::Parsers::DanbooruClones::Core
     
     public
     def parse(lines)
-
       opt = parse_option(lines.shift.text)
       items = Crawlers::Parsers::Commons::DiredParser.new.parse(lines)
       items = expand_items(items)
 
-      crawl(opt, items)
+       crawl(items, opt)
       @parent.parse(lines)
     end
 
@@ -126,7 +125,7 @@ module Crawlers::Parsers::DanbooruClones::Core
       return parsed_items
     end
 
-    def crawl(opt, items)
+    def crawl(items, opt)
       items.each do |item|
         do_crawl(item.keyword, opt.merge({parent_dir: item.dir.parent}))
       end
