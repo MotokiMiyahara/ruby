@@ -1,0 +1,13 @@
+# vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
+
+# #: コメント
+# /: フォルダ分け(インデントで閉じられたかを判定)
+# @: フォルダ分けを伴わない分類(フォルダ分けの閉じタグとしても機能)
+
+:konachan --type=append --shift="" --all=""
+  /chars
+    $alice
+
+    /bob
+      bob solo
+

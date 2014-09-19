@@ -101,9 +101,7 @@ module Crawlers::Parsers::Commons
       end
 
       def inspect
-        "k=#{keyword}"
-        #"d=#{dir}"
-        #"c=#{categories}"
+        "k=#{keyword} d=#{dir}"
       end
 
       private

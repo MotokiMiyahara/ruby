@@ -108,8 +108,8 @@ module Crawlers::Util::Helpers::Files
   def retry_fetch(message: '',  &block)
     raise 'block is required ' unless block
     initial_sec = 1
-    #try_max_limit = 10
-    try_max_limit = 5
+    try_max_limit = 10
+    #try_max_limit = 5
 
     try_count = 1
     begin

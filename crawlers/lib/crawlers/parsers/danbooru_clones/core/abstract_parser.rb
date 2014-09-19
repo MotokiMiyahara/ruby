@@ -16,7 +16,7 @@ module Crawlers::Parsers::DanbooruClones::Core
     # @example
     #  expand_exclusive_keywords(%w{a, b, c}) => ["a", "b -a", "c -b -a"]
     def expand_exclusive_keywords(keyword_list)
-      return keyword_list.each_with_index.map { |_, index|
+      return ([''] + keyword_list).each_index.map { |index|
         first = keyword_list[index]
         rest = keyword_list[0...index].reverse.map{|keyword|
           case keyword
@@ -33,13 +33,13 @@ module Crawlers::Parsers::DanbooruClones::Core
 
   class AbstractParser
     COMMON_KEYWORD = '-photo -animated '
-    EXTRA_KEYWORDS = Helper::expand_exclusive_keywords([
+
+    SHIFT_KEYWORDS = [
       'pussy',
       'nipples',
       'rating:explicit',
       '-rating:safe',
-    ])
-
+    ]
 
     def initialize(parent, noop)
       @parent = parent
@@ -48,9 +48,10 @@ module Crawlers::Parsers::DanbooruClones::Core
     
     public
     def parse(lines)
-      opt = parse_option(lines.shift.text)
+      opt, p_opt = parse_option(lines.shift.text)
+
       items = Crawlers::Parsers::Commons::DiredParser.new.parse(lines)
-      items = expand_items(items)
+      items = expand_items(items, p_opt)
 
        crawl(items, opt)
       @parent.parse(lines)
@@ -58,7 +59,11 @@ module Crawlers::Parsers::DanbooruClones::Core
 
     private
     def parse_option(command)
-      opt = {}
+      opt = {noop: @noop}
+      p_opt = {
+        all: COMMON_KEYWORD,
+        shift: SHIFT_KEYWORDS
+      }
       parser = OptionParser.new
       parser.on("--type=VAL"){|v|
         case v
@@ -100,29 +105,41 @@ module Crawlers::Parsers::DanbooruClones::Core
 
       parser.on("--min_page=VAL"){|v| opt[:min_page] = v.to_i}
       parser.on("--max_page=VAL"){|v| opt[:max_page] = v.to_i}
+
+      parser.on("--shift=VAL"){|v| p_opt[:shift] = v.split(/\s+/)}
+      parser.on("--all=VAL"){|v| p_opt[:all] = v}
+
       parser.parse(Shellwords.split(command))
-
-
-      opt[:noop] = @noop
-      return opt
+      return opt, p_opt
     end
 
     # $で始まるキーワードを展開する
-    def expand_items(items)
+    def expand_items(items, p_opt)
       parsed_items = items.flat_map{|item|
-        next [item] unless item.keyword =~ /^\$/
+        unless item.keyword =~ /^\$/
+          next create_item(item.categories, join_keywords(item.keyword, p_opt[:all]))
+        end
 
         base_keyword = item.keyword.sub(/^\$/, '')
-        new_categores = item.categories + [base_keyword]
+        new_categories = item.categories + [base_keyword]
         
-        expanded_items = EXTRA_KEYWORDS.map{|extra_keyword|
-          new_keyword = [base_keyword, extra_keyword, COMMON_KEYWORD].join(' ')
-          Crawlers::Parsers::Commons::DiredParser::Item.new(new_categores, new_keyword)
+        extra_keywords = Helper::expand_exclusive_keywords(p_opt[:shift])
+        expanded_items = extra_keywords.map{|extra_keyword|
+          new_keyword = join_keywords(base_keyword, extra_keyword, p_opt[:all])
+          create_item(new_categories, new_keyword)
         }
 
         next expanded_items
       }
       return parsed_items
+    end
+
+    def join_keywords(*keywords)
+      return keywords.flat_map{|k| k.split(/\s+/)}.reject(&:empty?).join(' ')
+    end
+
+    def create_item(categories, keyword)
+      return Crawlers::Parsers::Commons::DiredParser::Item.new(categories, keyword)
     end
 
     def crawl(items, opt)
