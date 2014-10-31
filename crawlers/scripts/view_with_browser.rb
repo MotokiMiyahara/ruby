@@ -24,7 +24,8 @@ class Scripts::ViewInPixiv
     private
     def get_uri(basename)
       case basename
-      when /^pixiv_(\d+)(?:_big_p\d+)?\.\w+/
+      #when /^pixiv_(\d+)(?:_big_p\d+)?\.\w+/
+      when /^pixiv_(\d+)(?:_(?:big_)?p\d+)?\.\w+/
         # pixiv
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
@@ -33,6 +34,9 @@ class Scripts::ViewInPixiv
 
       when /^konachan_(\d+)/
         "http://konachan.com/post/show/#{$1}/"
+
+      when /^yandere_(\d+)/
+        "https://yande.re/post/show/#{$1}/"
 
       when /^(\d+)(?:_big_p\d+)?\.\w+/
         # maybe pixiv
