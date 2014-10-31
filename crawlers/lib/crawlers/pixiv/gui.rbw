@@ -5,7 +5,7 @@ require 'pp'
 
 require_relative '../pixiv/constants'
 require_relative '../pixiv/user_crawler'
-require_relative '../parsers'
+#require_relative '../parsers'
 require_relative '../util'
 require_relative '../config'
 require_relative '../strages/image_store'
@@ -78,13 +78,16 @@ class PixivGui
     #parser = DslParser.new
     #parser.parse_file
 
-    invokers = Crawlers::Parsers::BootStrapper.new.parse_invokers
     
     puts Pixiv::PIXIV_DIR
+=begin
+    invokers = Crawlers::Parsers::BootStrapper.new.parse_invokers
     search_data = invokers.select{|invoker| invoker.type == :pixiv}.map(&:search_dir).compact
     search_data.map!{|p| Pathname('search').join(p, 'r18')}
     search_data.select!{|d| item_dir(d).exist?}
     search_data.sort_by!{|path| item_dir(path).mtime}.reverse!
+=end
+    search_data = []
     #puts search_data.map{|s|s.to_s.encode('sjis')}
 
     #user_data = Pixiv::UserCrawler::UserData.dirs
