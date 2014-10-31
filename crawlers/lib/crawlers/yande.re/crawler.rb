@@ -90,9 +90,9 @@ p base_uri
         id = s[0]
         path = CGI.unescapeHTML(s[1])
         ext = path.match(/\.[^.]+$/)[0]
-        dest_file = @dest_dir.join("#{id}#{ext}")
+        dest_file = @dest_dir.join("yandere_#{id}#{ext}")
 
-        image_uri = join_uri base_uri, path
+        image_uri = join_uri(base_uri, path)
         {image_uri: image_uri, dest_file: dest_file}
       }
 
@@ -116,12 +116,12 @@ p base_uri
     end
 
 
-    def download_image uri, referer, dest_file
+    def download_image(uri, referer, dest_file)
       raise CancellError, "Cancell crawling, because found #{dest_file} (news_only)" if @news_only && dest_file.exist?
 
       #@pool.push_task do
         begin
-          do_download_image uri, referer, dest_file
+          do_download_image(uri, referer, dest_file)
         rescue => e
           puts e
           pp e.backtrace
@@ -129,11 +129,11 @@ p base_uri
         #end
     end
 
-    def do_download_image uri, referer, dest_file
+    def do_download_image(uri, referer, dest_file)
       return if dest_file.exist?
       
 puts uri 
-      binary = @firefox.get_binary uri, 'Referer' => referer
+      binary = @firefox.get_binary(uri, 'Referer' => referer)
       open(dest_file, 'wb')do |f|
         f.write binary
       end
@@ -142,7 +142,7 @@ puts uri
     end
 
 
-    def join_uri *args
+    def join_uri(*args)
       return URI.join(*args).to_s
     end
   end
