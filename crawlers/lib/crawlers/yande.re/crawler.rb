@@ -24,7 +24,8 @@ end
 module Yandere
 
   YANDERE_DIR = Crawlers::Config::app_dir + 'yande.re'
-  NEWS_DIR = YANDERE_DIR + "news"
+  NEWS_ROTATE_DIR = YANDERE_DIR + "news"
+  NEWS_DIR        = NEWS_ROTATE_DIR + "news"
 
   # オプション引数の説明
   #   news_onlyが真のとき

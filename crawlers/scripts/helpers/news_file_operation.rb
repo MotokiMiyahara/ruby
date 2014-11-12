@@ -21,31 +21,32 @@ class Scripts::Helpers::NewsFileOperation
     type = ARGV.shift
     news_dir = case type
   when 'pixiv' 
-    Pixiv::NEWS_DIR
+    Pixiv::NEWS_ROTATE_DIR
   when 'moeren'
-    Moeren::Config::NEWS_DIR
+    Moeren::Config::NEWS_ROTATE_DIR
   when 'yandere'
-    Yandere::NEWS_DIR
+    Yandere::NEWS_ROTATE_DIR
   when 'gelbooru'
-    Crawlers::DanbooruClones::Gelbooru::Config.news_dir
+    Crawlers::DanbooruClones::Gelbooru::Config.news_rotate_dir
   when 'konachan'
-    Crawlers::DanbooruClones::Konachan::Config.news_dir
+    Crawlers::DanbooruClones::Konachan::Config.news_rotate_dir
   else
     raise "wrong type=#{type}"
   end
 
-  should_delete = false
+  should_operate = false
   opt = OptionParser.new
-  opt.on('-y', 'say yes'){should_delete = true}
+  opt.on('-y', 'say yes'){should_operate = true}
   opt.parse!
 
   #should_delete ||= say_yes?("Do you want to delete #{news_dir}?")
-  should_operate ||= say_yes?(message(news_dir))
+  should_operate ||= say_yes?(pre_message(news_dir))
   exit unless should_operate
 
   #Crawlers::Util::clean_up_dir(news_dir)
   operate(news_dir)
-  puts "finish. (#{news_dir})"
+  #puts "finish. (#{news_dir})"
+  puts post_message(news_dir)
 end
 
 def say_yes?(prompt)
@@ -55,7 +56,12 @@ def say_yes?(prompt)
 end
 
 
-def message(news_dir)
+def pre_message(news_dir)
+  raise 'not implemented.'
+end
+
+
+def post_message(news_dir)
   raise 'not implemented.'
 end
 

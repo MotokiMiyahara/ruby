@@ -3,7 +3,9 @@
 require 'pathname'
 require 'fileutils'
 
-class DirRotator
+require_relative 'modules'
+
+class Mtk::Util::DirRotator
   LENGTH = 5
   MAX = LENGTH - 1
   PREFIX = 'news'

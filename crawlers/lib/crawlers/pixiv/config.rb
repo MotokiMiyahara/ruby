@@ -8,10 +8,11 @@ require 'pp'
 
 module Pixiv
   PIXIV_DIR     = Crawlers::Config::app_dir + 'pixiv'
-  NEWS_DIR      = PIXIV_DIR + "news"
-  SEARCH_DIR    = PIXIV_DIR + "search"
-  USER_DIR      = PIXIV_DIR + "user"
-  ALL_IMAGE_DIR = PIXIV_DIR + "_all_images"
+  NEWS_ROTATE_DIR = PIXIV_DIR + "news"
+  NEWS_DIR        = NEWS_ROTATE_DIR + "news"
+  SEARCH_DIR      = PIXIV_DIR + "search"
+  USER_DIR        = PIXIV_DIR + "user"
+  ALL_IMAGE_DIR   = PIXIV_DIR + "_all_images"
 end
 
 module Pixiv

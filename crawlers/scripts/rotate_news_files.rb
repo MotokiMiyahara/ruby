@@ -17,12 +17,20 @@ module Scripts; end
 
 class Scripts::RotateNewsFiles < Scripts::Helpers::NewsFileOperation
 
-  def message(news_dir)
-    return "Do you want to delete #{news_dir}?"
+  private
+  # @Override
+  def pre_message(news_dir)
+    return "Do you want to rotate #{news_dir}?"
   end
 
+  # @Override
+  def post_message(news_dir)
+    return "finish rotating. (#{news_dir})"
+  end
+
+  # @Override
   def operate(news_dir)
-    Mtk::Util::DirRotator.new(news_dir, verbose: true).rotate
+    Mtk::Util::DirRotator.new(news_dir, verbose: false).rotate
   end
 end
 

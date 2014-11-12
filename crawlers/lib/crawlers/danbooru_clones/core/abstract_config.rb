@@ -14,8 +14,12 @@ module Crawlers::DanbooruClones::Core
         return Crawlers::Config::app_dir + site_name
       end
 
-      def news_dir
+      def news_rotate_dir
         return site_dir + "news"
+      end
+
+      def news_dir
+        return news_rotate_dir + "news"
       end
 
       def search_dir

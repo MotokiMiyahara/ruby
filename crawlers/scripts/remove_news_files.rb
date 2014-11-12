@@ -16,10 +16,17 @@ module Scripts; end
 
 class Scripts::RemoveNewsFiles < Scripts::Helpers::NewsFileOperation
 
-  def message(news_dir)
+  # @Override
+  def pre_message(news_dir)
     return "Do you want to delete #{news_dir}?"
   end
 
+  # @Override
+  def post_message(news_dir)
+    return "finish deleting. (#{news_dir})"
+  end
+
+  # @Override
   def operate(news_dir)
     Crawlers::Util::clean_up_dir(news_dir)
   end

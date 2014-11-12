@@ -12,7 +12,8 @@ module Moeren
     extend self
 
     DEST_DIR = My::CONFIG.dest_dir.join('crawler/moeren')
-    NEWS_DIR = DEST_DIR.join("news")
+    NEWS_ROTATE_DIR = DEST_DIR.join("news")
+    NEWS_DIR        = NEWS_ROTATE_DIR + "news"
     
     def news_count 
       count_files NEWS_DIR
