@@ -23,7 +23,7 @@ class Mtk::Util::DirRotator
       dest_dir = dir(dest)
 
       raise if dest_dir.exist?
-      mv(src_dir, dest_dir)if src_dir.exist?
+      mv(src_dir, dest_dir) if src_dir.exist?
     end
 
     mkdir(dir(0))
