@@ -6,6 +6,7 @@ require_relative '../lib/crawlers/config'
 require_relative '../lib/crawlers/pixiv/constants'
 require_relative '../lib/crawlers/moeren/config'
 require_relative '../lib/crawlers/yande.re/crawler'
+require_relative '../lib/crawlers/hentai/config'
 require_relative '../lib/crawlers/danbooru_clones/konachan/config'
 require_relative '../lib/crawlers/danbooru_clones/gelbooru/config'
 
@@ -30,6 +31,8 @@ def main
     Moeren::Config::NEWS_DIR,
     Yandere::YANDERE_DIR,
     Yandere::NEWS_DIR,
+
+    Hentai::Config.site_dir,
 
     *([Gelbooru, Konachan].flat_map{|clazz|
       [

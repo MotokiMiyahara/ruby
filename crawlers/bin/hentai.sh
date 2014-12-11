@@ -1,4 +1,4 @@
 #!/bin/sh
-/usr/bin/env ruby ../lib/crawlers/hentai/crawler.rb "$@"
+/usr/bin/env ruby `dirname $0`/../lib/crawlers/hentai/crawler.rb "$@"
 
 
