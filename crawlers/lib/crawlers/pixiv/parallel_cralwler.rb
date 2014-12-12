@@ -71,7 +71,6 @@ module Pixiv
       @max_page = opts[:max_page]
       @news_only = opts[:news_only]
       @news_save = opts[:news_save]
-      @db = opts[:db]
 
       @firefox = Mtk::Net::Firefox.new
 
@@ -259,11 +258,6 @@ module Pixiv
         raise Crawlers::DataSourceError, "not found work_display uri=#{base_uri}}"
       end
 
-      if @db
-        picture = PictureDb::Picture.new
-        else
-        picture = PictureDb::DummyPicture.new
-      end
 
       #puts "base_uri=#{base_uri}"
       ##puts anchor
@@ -273,11 +267,6 @@ module Pixiv
       #puts
 
 
-      picture.illust_id = works_uri.match(/illust_id=(\d+)/)[1]
-      picture.tags = scan_tags(doc).join(" ")
-      picture.score_count = (doc.at_css('dd.score-count').text.strip =~ /\d+/) ? $&.to_i : 0
-
-      @db.insert_picture picture if @db
 
       return crawl_works(works_uri, base_uri, picture)
     end
@@ -322,7 +311,6 @@ module Pixiv
 
     def download_images(remote_images)
       Parallel.map(remote_images, in_threads: THREAD_COUNT_DOWNLOAD_IMAGES) {|image|
-        @db.insert_file_path(image.picture, image.regular_file) if @db
         image.download
       }
     end
