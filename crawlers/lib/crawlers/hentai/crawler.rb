@@ -14,7 +14,7 @@ require_relative '../util'
 module Hentai
   class Crawler 
     include Crawlers::Util
-    THREAD_COUNT_GET_IMAGE_URLS = 10
+    THREAD_COUNT_GET_IMAGE_URLS = 3
 
     def crawl(uri)
       index_uri = replace_query(URI(uri), 'p' => '0')
@@ -24,14 +24,27 @@ module Hentai
     def create_agent
       agent = Mechanize.new
       agent.user_agent_alias = 'Windows Mozilla'
+      #agent.keep_alive = false
       return agent
     end
 
     def crawl_index(uri)
       @agent = create_agent
 
-      index_page = @agent.get(uri)
+      page = @agent.get(uri)
+      h1 = page.at('h1')
+      if h1 && h1.text =~ /Content\s+Warning/i
+        # 警告ページに飛ばされた
+        index_page = page.link_with(text: /View\s+Gallery/i).click()
+      else
+        # indexページにいる
+        index_page = page
+      end
+      
       title = index_page.at('#gj').text.strip
+      title.gsub!(/^\.\./, '')
+      title.gsub!('/', '_')
+
       log("title: #{title}")
 
       @dest_dir = Config.site_dir + title
@@ -55,9 +68,12 @@ module Hentai
 
       loop do
         list_pages << current_page
-        larger_image_number, max_image_number = current_page.at('.ip').text.match(/\d+\s*-\s*(\d+)\s*of\s*(\d+)/).to_a.values_at(1, 2).map(&:to_i)
 
-        #pp [max_image_number ,larger_image_number ]
+        figs = current_page.at('.ip').text.match(/[0-9,]+\s*-\s*([0-9,]+)\s*of\s*([0-9,]+)/).to_a.values_at(1, 2)
+        figs.map!{|fig| fig.gsub(',', '')}.map!(&:to_i)
+        larger_image_number, max_image_number = *figs
+
+        #pp [max_image_number ,larger_image_number]
         break if max_image_number <= larger_image_number 
 
         current_page_number = extract_query_value(current_page.uri, 'p', default: 0).to_i
@@ -110,16 +126,24 @@ module Hentai
     def crawl_list_page(page)
       view_links = page.links_with(search: '#gdt .gdtm a')
 
-      Parallel.map(view_links, in_threads: THREAD_COUNT_GET_IMAGE_URLS) {|link|
-        agent = create_agent
+      #Parallel.map(view_links, in_threads: THREAD_COUNT_GET_IMAGE_URLS) {|link|
+      #
+      
+      agent = create_agent
+      view_links.each {|link|
         view_page = agent.get(link.uri)
 
         src_uri = view_page.at('#img')['src']
-        log(src_uri)
 
-        src = agent.get(src_uri)
-        dest = @dest_dir + src.filename
-        src.save_as(dest) unless dest.exist?
+        filename = src_uri.split('/')[-1]
+        dest = @dest_dir + filename
+
+        log('-------- ' + filename )
+        unless dest.exist?
+          log(src_uri)
+          src = agent.get(src_uri)
+          src.save_as(dest)
+        end
       }
     end
   end
