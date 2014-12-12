@@ -145,55 +145,11 @@ module Pixiv
         raise CancellError, "Cancell crawling, because not found new images in {page: #{page}, keyword: '#{@keyword}'} (news_only)" 
       end
 
-      # ページ内にダウンロード済みの画像があれば巡回停止
-      #if @news_only
-      #  unless existing_child_uris.empty?
-      #    raise CancellError, "Cancell crawling, because found #{@search_file_finder.find_by_uri(existing_child_uris[0])} (news_only)"
-      #  end
-      #  raise CancellError, "Cancell crawling, because found #{existing_images[0].search_file} (news_only)" unless existing_images.empty?
-      #end
-
       # 次のページがなければ巡回を終了
       unless doc.css(%Q{ul.page-list li a}).any?{|a| a[:href] =~ /\bp=#{page+1}\b/}
         raise CancellError, "Reach end of index page: page=#{page} keyword=#{@keyword}"
       end
     end
-
-    #def crawl_index page
-    #  #log "index: page=#{page} keyword=#{@keyword}"
-    #  log "index: page=#{page} #{ident_message}"
-    #  base_uri = index_uri(page)
-    #  doc = get_document(base_uri)
-
-    #  # もう画像がない
-    #  if doc.at_css('div._no-item')
-    #    raise OutOfIndexError, "Out of index page: page=#{page} keyword=#{@keyword}"
-    #  end
-
-    #  anchors = doc.css('li.image-item a.work')
-    #  child_uris = anchors.map{|anchor| child_uri = join_uri(base_uri, anchor[:href])}
-    #  
-    #  # ネットワーク接続無しでダウンロード済みのファイルを取り除く
-    #  existing_child_uris, new_child_uris = child_uris.partition{|uri| @search_file_finder.find_by_uri(uri)} 
-    #  images = fetch_remote_images(base_uri, new_child_uris)
-
-    #  # 実際に接続した結果を利用してダウンロード済みのファイルを取り除く
-    #  existing_images, new_images,  = images.partition{|img| img.search_file.exist?}
-    #  download_images(new_images)
-
-    #  # ページ内にダウンロード済みの画像があれば巡回停止
-    #  if @news_only
-    #    unless existing_child_uris.empty?
-    #      raise CancellError, "Cancell crawling, because found #{@search_file_finder.find_by_uri(existing_child_uris[0])} (news_only)"
-    #    end
-    #    raise CancellError, "Cancell crawling, because found #{existing_images[0].search_file} (news_only)" unless existing_images.empty?
-    #  end
-
-    #  # 次のページがなければ巡回を終了
-    #  unless doc.css(%Q{ul.page-list li a}).any?{|a| a[:href] =~ /\bp=#{page+1}\b/}
-    #    raise CancellError, "Reach end of index page: page=#{page} keyword=#{@keyword}"
-    #  end
-    #end
 
     def index_uri(page)
       h = {
@@ -246,29 +202,31 @@ module Pixiv
       # 公開レベルなどの制限を受けたときは何もしない
       return [] if doc.at_css('span.error')
 
+      # Pixiv動画は未対応
       if doc.at_css(%q{div.works_display div._ugoku-illust-player-container})
-        # Pixiv動画は未対応
         return []
       end
 
-      anchor = doc.at_css(%q{div.works_display a[target="_blank"]})
-      if anchor
-        works_uri = join_uri(base_uri, anchor[:href])
-      else
-        raise Crawlers::DataSourceError, "not found work_display uri=#{base_uri}}"
+      picture = PictureDb::DummyPicture.new
+      picture.illust_id = base_uri.match(/illust_id=(\d+)/)[1]
+      picture.tags = scan_tags(doc).join(" ")
+      picture.score_count = (doc.at_css('dd.score-count').text.strip =~ /\d+/) ? $&.to_i : 0
+
+      # 一枚絵
+      big_image = doc.at_css(%q{div.works_display img.big})
+      if big_image
+        image_uri = join_uri(base_uri, big_image['data-src'])
+        return [create_remote_image(image_uri, base_uri, picture)]
       end
 
+      # 漫画
+      manga_anchor = doc.at_css(%q{div.works_display a.multiple,a.manga})
+      if manga_anchor
+        manga_uri = join_uri(base_uri, manga_anchor[:href])
+        return crawl_manga(manga_uri, base_uri, picture)
+      end
 
-      #puts "base_uri=#{base_uri}"
-      ##puts anchor
-      #puts "works_uri=#{works_uri}"
-      #puts doc.at(%q{div.works_display}),to_s
-      #puts '---------------'
-      #puts
-
-
-
-      return crawl_works(works_uri, base_uri, picture)
+      raise "Unexpected data-type. uri=#{base_uri}"
     end
 
 
@@ -277,16 +235,16 @@ module Pixiv
       return doc.css('.tags-container .tags .tag a.text').map(&:text).map(&:strip)
     end
     
-    # @return [Array<Remoteimage>]
-    def crawl_works(base_uri, referer, picture)
-      if base_uri =~ /mode=big/
-        return crawl_big(base_uri, referer, picture)
-      elsif base_uri =~ /mode=manga/
-        return crawl_manga(base_uri, referer, picture)
-      else
-        raise "unknown pattern: #{base_uri}"
-      end
-    end
+    ## @return [Array<Remoteimage>]
+    #def crawl_works(base_uri, referer, picture)
+    #  if base_uri =~ /mode=big/
+    #    return crawl_big(base_uri, referer, picture)
+    #  elsif base_uri =~ /mode=manga/
+    #    return crawl_manga(base_uri, referer, picture)
+    #  else
+    #    raise "unknown pattern: #{base_uri}"
+    #  end
+    #end
 
     # @return [Array<Remoteimage>]
     def crawl_big(base_uri, referer, picture)
@@ -296,7 +254,11 @@ module Pixiv
 
       image_uri = join_uri(base_uri, img[:src])
 
-      return [RemoteImage.new(@firefox, @news_save, @dest_dir, @r18_dir, image_uri, base_uri, picture)]
+      return [create_remote_image(image_uri, base_uri, picture)]
+    end
+
+    def create_remote_image(image_uri, base_uri, picture)
+      return RemoteImage.new(@firefox, @news_save, @dest_dir, @r18_dir, image_uri, base_uri, picture)
     end
 
     # @return [Array<Remoteimage>]
