@@ -14,17 +14,23 @@ require_relative '../util'
 module Hentai
   class Crawler 
     include Crawlers::Util
-    THREAD_COUNT_GET_IMAGE_URLS = 3
+    #THREAD_COUNT_GET_IMAGE_URLS = 3
 
     def crawl(uri)
       index_uri = replace_query(URI(uri), 'p' => '0')
-      crawl_index(index_uri)
+      begin
+        crawl_index(index_uri)
+      rescue Mechanize::ResponseCodeError, Mechanize::ResponseReadError => e
+        log("#{e} #{e.class.name}")
+        sleep(1000)
+        retry
+      end
     end
 
     def create_agent
       agent = Mechanize.new
       agent.user_agent_alias = 'Windows Mozilla'
-      #agent.keep_alive = false
+      agent.keep_alive = false
       return agent
     end
 
@@ -41,6 +47,7 @@ module Hentai
         index_page = page
       end
       
+      #pp index_page
       title = index_page.at('#gj').text.strip
       title.gsub!(/^\.\./, '')
       title.gsub!('/', '_')
@@ -79,9 +86,7 @@ module Hentai
         current_page_number = extract_query_value(current_page.uri, 'p', default: 0).to_i
         next_page_number = current_page_number + 1
         next_uri = replace_query(current_page.uri, 'p' => next_page_number)
-
         current_page = @agent.get(next_uri.to_s)
-        #pp current_page.uri
       end
 
       return list_pages
@@ -131,25 +136,35 @@ module Hentai
       
       agent = create_agent
       view_links.each {|link|
-        view_page = agent.get(link.uri)
+        guess_filename = link.node.at('img')[:title]
+        guess_dest = @dest_dir + guess_filename
+        next if guess_dest.exist?
 
+        view_page = agent.get(link.uri)
         src_uri = view_page.at('#img')['src']
 
-        filename = src_uri.split('/')[-1]
-        dest = @dest_dir + filename
 
-        log('-------- ' + filename )
-        unless dest.exist?
-          log(src_uri)
+        guess2_filename = src_uri.split('/')[-1]
+        guess2_dest = @dest_dir + guess2_filename
+
+        next if guess2_dest.exist?
+
+        log(src_uri)
+        begin 
           src = agent.get(src_uri)
-          src.save_as(dest)
-        end
+        rescue Net::HTTP::Persistent::Error => e
+          log("skip: #{src_uri} Because of #{e}(#{e.class.name})")
+          next
+        end 
+
+        dest = @dest_dir + src.filename
+        next if dest.exist?
+        log("-save: #{src.filename}")
+        src.save_as(dest) 
       }
     end
   end
 end
-
-
 
 
 if $0 == __FILE__
