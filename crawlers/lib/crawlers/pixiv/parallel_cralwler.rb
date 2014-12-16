@@ -196,6 +196,7 @@ module Pixiv
       return []
     end
 
+    # @return [Array<Remoteimage>]
     def do_crawl_child(base_uri, referer)
       doc = get_document(base_uri, 'Referer' => referer)
 
@@ -211,20 +212,28 @@ module Pixiv
       picture.illust_id = base_uri.match(/illust_id=(\d+)/)[1]
       picture.tags = scan_tags(doc).join(" ")
       picture.score_count = (doc.at_css('dd.score-count').text.strip =~ /\d+/) ? $&.to_i : 0
-
       # 一枚絵
-      big_image = doc.at_css(%q{div.works_display img.big})
+      #big_image = doc.at_css(%q{div.works_display img.big})
+      big_image = doc.at_css(%q{img.original-image})
       if big_image
         image_uri = join_uri(base_uri, big_image['data-src'])
         return [create_remote_image(image_uri, base_uri, picture)]
       end
 
       # 漫画
-      manga_anchor = doc.at_css(%q{div.works_display a.multiple,a.manga})
+      #manga_anchor = doc.at_css(%q{div.works_display a.multiple,a.manga})
+      manga_anchor = doc.at_css(%q{div.works_display a.multiple,a.manga,a._work})
+      if !manga_anchor && doc.at_css(%q{div.works_display .multiple})
+        manga_anchor = doc.at_css(%q{div.works_display a[target="_blank"]})
+      end
       if manga_anchor
         manga_uri = join_uri(base_uri, manga_anchor[:href])
-        return crawl_manga(manga_uri, base_uri, picture)
+        #raise "bad manga uri: #{manga_uri}" unless manga_uri =~ /[?&]mode=manga(?:$|&)/
+        #return crawl_manga(manga_uri, base_uri, picture)
+        
+        return crawl_works(manga_uri, base_uri, picture)
       end
+
 
       raise "Unexpected data-type. uri=#{base_uri}"
     end
@@ -235,16 +244,16 @@ module Pixiv
       return doc.css('.tags-container .tags .tag a.text').map(&:text).map(&:strip)
     end
     
-    ## @return [Array<Remoteimage>]
-    #def crawl_works(base_uri, referer, picture)
-    #  if base_uri =~ /mode=big/
-    #    return crawl_big(base_uri, referer, picture)
-    #  elsif base_uri =~ /mode=manga/
-    #    return crawl_manga(base_uri, referer, picture)
-    #  else
-    #    raise "unknown pattern: #{base_uri}"
-    #  end
-    #end
+    # @return [Array<Remoteimage>]
+    def crawl_works(base_uri, referer, picture)
+      if base_uri =~ /mode=big/
+        return crawl_big(base_uri, referer, picture)
+      elsif base_uri =~ /mode=manga/
+        return crawl_manga(base_uri, referer, picture)
+      else
+        raise "unknown pattern: #{base_uri}"
+      end
+    end
 
     # @return [Array<Remoteimage>]
     def crawl_big(base_uri, referer, picture)
