@@ -49,6 +49,7 @@ module Hentai
       
       #pp index_page
       title = index_page.at('#gj').text.strip
+      title = title.empty? ? index_page.at('#gn').text.strip : title
       title.gsub!(/^\.\./, '')
       title.gsub!('/', '_')
 
