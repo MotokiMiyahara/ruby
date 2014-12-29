@@ -153,7 +153,7 @@ module Hentai
         log(src_uri)
         begin 
           src = agent.get(src_uri)
-        rescue Net::HTTP::Persistent::Error => e
+        rescue Net::HTTP::Persistent::Error, Errno::EHOSTUNREACH => e
           log("skip: #{src_uri} Because of #{e}(#{e.class.name})")
           next
         end 
