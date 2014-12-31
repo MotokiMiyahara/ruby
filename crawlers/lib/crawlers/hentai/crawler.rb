@@ -22,7 +22,7 @@ module Hentai
         crawl_index(index_uri)
       rescue Mechanize::ResponseCodeError, Mechanize::ResponseReadError => e
         log("#{e} #{e.class.name}")
-        sleep(1000)
+        sleep(rand(3 .. 5))
         retry
       end
     end
