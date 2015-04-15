@@ -77,7 +77,9 @@ module Hentai
       loop do
         list_pages << current_page
 
-        figs = current_page.at('.ip').text.match(/[0-9,]+\s*-\s*([0-9,]+)\s*of\s*([0-9,]+)/).to_a.values_at(1, 2)
+        #page_description = current_page.at('.ip').text
+        page_description = current_page.at('.gpc').text
+        figs = page_description.match(/[0-9,]+\s*-\s*([0-9,]+)\s*of\s*([0-9,]+)/).to_a.values_at(1, 2)
         figs.map!{|fig| fig.gsub(',', '')}.map!(&:to_i)
         larger_image_number, max_image_number = *figs
 
