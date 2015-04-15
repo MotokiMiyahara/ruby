@@ -49,6 +49,7 @@ class DirDivider
   def list_files(src_dir)
     files = []
     Shell.new.system('ls', '-f', src_dir).each{|s| files << s}
+    #Shell.new.system('ls', '-rt', src_dir).each{|s| files << s}
     files.map!(&:chomp)
     files.reject!{|file| file == '.' || file == '..'}
     return files
