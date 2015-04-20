@@ -64,18 +64,22 @@ module Pixiv
       @max_page = opts[:max_page]
       @news_only = opts[:news_only]
       @news_save = opts[:news_save]
+      @noop = opts[:noop]
 
       @firefox = Mtk::Net::Firefox.new
 
-      @dest_dir = make_dest_dir(keyword, opts[:parent_dir], @is_r18)
+      @dest_dir = make_dest_dir(keyword, opts[:parent_dir], @is_r18, @noop)
       @search_file_finder = SearchFileFinder.new(@dest_dir)
 
-      if @is_r18
-        # すでにr18なので振り分ける必要がない
-        @r18_dir = nil
-      elsif
-        @r18_dir = @dest_dir.join("r18")
-        @r18_dir.mkdir unless @r18_dir.exist?
+      # この機能は削除予定
+      unless @noop
+        if @is_r18
+          # すでにr18なので振り分ける必要がない
+          @r18_dir = nil
+        elsif
+          @r18_dir = @dest_dir.join("r18")
+          @r18_dir.mkdir unless @r18_dir.exist?
+        end
       end
 
       NEWS_DIR.mkdir unless NEWS_DIR.exist?
@@ -84,9 +88,24 @@ module Pixiv
 
 
     public
-
-
     def crawl
+      if @noop
+        log_status
+      else
+        do_crawl
+      end
+    end
+
+
+    private
+    def log_status
+      log '---------------------------'
+      log "@dest_dir=#{@dest_dir}"
+      log "@keyword=#{@keyword}"
+      log 
+    end
+
+    def do_crawl
       (@min_page .. @max_page).each do |page|
         crawl_index(page)
       end
@@ -97,7 +116,6 @@ module Pixiv
     end
 
 
-    private
     def ident_message
       return "keyword='#{@keyword}'"
     end
@@ -254,13 +272,13 @@ module Pixiv
       }
     end
 
-    def make_dest_dir(keyword, parent_dir, is_r18)
+    def make_dest_dir(keyword, parent_dir, is_r18, noop)
       parent_dir = "" unless parent_dir
       parent_dir = parent_dir.split('/').map{|s| fix_basename(s)}.join('/')
 
       dir_prefix = is_r18 ? "r18_" : ""
       dest_dir = SEARCH_DIR.join(parent_dir, "#{fix_basename(dir_prefix + keyword)}")
-      dest_dir.mkpath unless dest_dir.exist?
+      dest_dir.mkpath unless noop || dest_dir.exist?
       return dest_dir
     end
 

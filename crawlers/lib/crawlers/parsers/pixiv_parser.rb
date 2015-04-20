@@ -10,9 +10,10 @@ module Crawlers::Parsers
   class PixivParser
     #include Crawlers::Util
 
-    def initialize(parent, db)
+    def initialize(parent, db, noop)
       @parent = parent
       @db = db
+      @noop = noop
     end
     
     public
@@ -26,7 +27,8 @@ module Crawlers::Parsers
     private
     def parse_option(command)
       opt = {
-        db: @db
+        db: @db,
+        noop: @noop
       }
       parser = OptionParser.new
       parser.on("--type=VAL"){|v|

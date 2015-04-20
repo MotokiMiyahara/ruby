@@ -34,7 +34,7 @@ module Crawlers::Parsers
       return unless lines.first
       case lines.first.text
       when /^:pixiv/
-        PixivParser.new(self, @pixiv_db).parse(lines)
+        PixivParser.new(self, @pixiv_db, @noop).parse(lines)
       when /^:yandere/
         #YandereParser.new(self, @yandere_pool).parse(lines)
         YandereParser.new(self).parse(lines)
