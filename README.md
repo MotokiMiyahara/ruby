@@ -6,7 +6,7 @@ WEB上の画像投稿サイトから、画像を自動収集します。
 
 
 ## Usage
-1.下記のファイル内容をファイルに保存する。
+1. 下記のファイル内容をファイルに保存する。
 
     `
       ---[sample_dsl.txt]---
@@ -31,19 +31,21 @@ WEB上の画像投稿サイトから、画像を自動収集します。
           山 風景
           海 風景
     `
-2.下記のコマンドを実行する
+2. 下記のコマンドを実行する
+
 `ruby crawlers/bin/fire_all.rb -f sample_dsl.txt`
 
 3.  インストール時に指定した画像保存ディレクトリ下のpixiv/search/下に画像が保存される。
 
 
 ## Install
-1.my_libにパスを通す
+1. my_libにパスを通す
+
 `RUBYLIB=path/to/this/ruby/mylib`
 
-2.依存するgemをインストール(crawlers/crawlers.gemspecを参照)
+2. 依存するgemをインストール(crawlers/crawlers.gemspecを参照)
 
-4.画像保存ディレクトリをプログラムに設定
+3. 画像保存ディレクトリをプログラムに設定
     `
       # vim:set fileencoding=utf-8:
 
@@ -58,7 +60,7 @@ WEB上の画像投稿サイトから、画像を自動収集します。
         end
       end
     `
-3.画像保存ディレクトリを作成
+4. 画像保存ディレクトリを作成
 `ruby crawlers/bin/installer_crawlers.rb`
 
 ## Author
