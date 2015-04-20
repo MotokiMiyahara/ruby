@@ -5,31 +5,33 @@ Overview
 
 WEB上の画像投稿サイトから、画像を自動収集します。
 
+## Requirement
+Firefox(各サイトへのログイン情報をFirefoxのCookieから取得するため)
 
 ## Usage
 1. 下記のファイル内容をファイルに保存する。
+```sample_dsl.txt
+# vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
-         ---[sample_dsl.txt]---
-         # vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
+# #: コメント
+# /: フォルダ分け(インデントで閉じられたかを判定)
+# @: フォルダ分けを伴わない分類(フォルダ分けの閉じタグとしても機能)
 
-         # #: コメント
-         # /: フォルダ分け(インデントで閉じられたかを判定)
-         # @: フォルダ分けを伴わない分類(フォルダ分けの閉じタグとしても機能)
+#:pixiv --type=renew  --max_page=2 --r18=false
+#:pixiv --type=append --max_page=2 --r18=false
+:pixiv --type=new    --max_page=2 --r18=false
+ /chars
+   /ドラゴンボール
+     孫悟空 ドラゴンボール
+     ベジータ ドラゴンボール
+   
+   /ドラえもん
+     のび太
 
-         #:pixiv --type=renew  --max_page=2 --r18=false
-         #:pixiv --type=append --max_page=2 --r18=false
-         :pixiv --type=new    --max_page=2 --r18=false
-           /chars
-             /ドラゴンボール
-               孫悟空 ドラゴンボール
-               ベジータ ドラゴンボール
-             
-             /ドラえもん
-               のび太
-
-           /風景画
-             山 風景
-             海 風景
+ /風景画
+   山 風景
+   海 風景
+```
 
 2. 下記のコマンドを実行する
           ruby crawlers/bin/fire_all.rb -f sample_dsl.txt
@@ -59,6 +61,8 @@ WEB上の画像投稿サイトから、画像を自動収集します。
     
 4. 画像保存ディレクトリを作成
 `ruby crawlers/bin/installer_crawlers.rb`
+
+5. PixivのサイトにFirefoxでログインする(自動ログインを有効にする)
 
 ## Author
 [MotokiMiyahara](https://github.com/MotokiMiyahara/)
