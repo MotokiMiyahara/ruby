@@ -19,7 +19,7 @@ module Crawlers::Parsers
     def parse lines
       opt = parse_option(lines.shift.text)
       dirs_and_keywords = shift_keywords(lines)
-      crawl opt, dirs_and_keywords
+      crawl(opt, dirs_and_keywords)
       @parent.parse(lines)
     end
 

@@ -79,13 +79,12 @@ if $0 == __FILE__
     Crawlers::DanbooruClones::Gelbooru::Crawler.new(
       keyword,
       news_only: true,
-      noop: false
+      noop: true,
     ).crawl
   end
 
   KEYWORDS = [
-    'nude_filter',
-    #'smile nipples pussy -amputee -nude_filter',
+    'dragon_ball',
   ]
 
   tlog('start')
