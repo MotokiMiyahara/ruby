@@ -43,21 +43,21 @@ WEB上の画像投稿サイトから、画像を自動収集します。
 2. 依存するgemをインストール(crawlers/crawlers.gemspecを参照)
 
 3. 画像保存ディレクトリをプログラムに設定
-    `
-      # vim:set fileencoding=utf-8:
+         # vim:set fileencoding=utf-8:
 
-      require 'pathname'
+         require 'pathname'
 
-      # monkey patching
-      class Crawlers::Config
-        class << self
-          def app_dir
-            return Pathname('/home/xxxx/generated_data/crawlers')
-          end
-        end
-      end
-    `
+         # monkey patching
+         class Crawlers::Config
+           class << self
+             def app_dir
+               return Pathname('/home/xxxx/generated_data/crawlers')
+             end
+           end
+         end
+    
 4. 画像保存ディレクトリを作成
+
 `ruby crawlers/bin/installer_crawlers.rb`
 
 ## Author
