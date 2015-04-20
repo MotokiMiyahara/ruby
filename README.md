@@ -69,7 +69,7 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 
     
 4. 画像保存ディレクトリを作成
-`ruby crawlers/bin/installer_crawlers.rb`
+  `ruby crawlers/bin/installer_crawlers.rb`
 
 5. PixivのサイトにFirefoxでログインする(自動ログインを有効にする)
 
