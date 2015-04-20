@@ -38,7 +38,7 @@ WEB上の画像投稿サイトから、画像を自動収集します。
 
 ## Install
 1. my_libにパスを通す
-         RUBYLIB=path/to/this/ruby/mylib`
+         RUBYLIB=path/to/this/ruby/mylib
 
 2. 依存するgemをインストール(crawlers/crawlers.gemspecを参照)
 
