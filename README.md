@@ -52,21 +52,20 @@ RUBYLIB=path/to/this/ruby/mylib
 2. 依存するgemをインストール(crawlers/crawlers.gemspecを参照)
 
 3. 画像保存ディレクトリをプログラムに設定
+  ```
+  # vim:set fileencoding=utf-8:
 
-```
-# vim:set fileencoding=utf-8:
+  require 'pathname'
 
-require 'pathname'
-
-# monkey patching
-class Crawlers::Config
- class << self
-   def app_dir
-     return Pathname('/home/xxxx/generated_data/crawlers')
+  # monkey patching
+  class Crawlers::Config
+   class << self
+     def app_dir
+       return Pathname('/home/xxxx/generated_data/crawlers')
+     end
    end
- end
-end
-```
+  end
+  ```
 
     
 4. 画像保存ディレクトリを作成
