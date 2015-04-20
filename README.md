@@ -72,6 +72,7 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 `ruby crawlers/bin/installer_crawlers.rb`
 
 5. PixivのサイトにFirefoxでログインする(自動ログインを有効にする)
+
 ログイン後、Firefoxは終了してよい。
 
 ## Author
