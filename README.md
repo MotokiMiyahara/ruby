@@ -59,11 +59,11 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 
   # monkey patching
   class Crawlers::Config
-   class << self
-     def app_dir
-       return Pathname('/home/xxxx/generated_data/crawlers')
-     end
-   end
+    class << self
+      def app_dir
+        return Pathname('/home/xxxx/generated_data/crawlers')
+      end
+    end
   end
   ```
 
