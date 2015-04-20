@@ -43,7 +43,11 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 
 ## Install
 1. my_libにパスを通す
-`RUBYLIB=path/to/this/ruby/mylib`
+
+```
+---[~/.bashrc など]---
+RUBYLIB=path/to/this/ruby/mylib
+```
 
 2. 依存するgemをインストール(crawlers/crawlers.gemspecを参照)
 
