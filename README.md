@@ -10,6 +10,7 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 
 ## Usage
 1. 下記のファイル内容をファイルに保存する。
+
 ```sample_dsl.txt
 # vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
