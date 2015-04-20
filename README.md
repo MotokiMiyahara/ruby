@@ -8,8 +8,6 @@ WEB上の画像投稿サイトから、画像を自動収集します。
 ## Usage
 1. 下記のファイル内容をファイルに保存する。
 
-
-    `
       ---[sample_dsl.txt]---
       # vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
@@ -31,7 +29,7 @@ WEB上の画像投稿サイトから、画像を自動収集します。
         /風景画
           山 風景
           海 風景
-    `
+
 2. 下記のコマンドを実行する
 
 `ruby crawlers/bin/fire_all.rb -f sample_dsl.txt`
