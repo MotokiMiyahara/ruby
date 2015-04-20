@@ -46,7 +46,7 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 
   ```
   ---[~/.bashrc など]---
-  RUBYLIB=path/to/this/ruby/mylib
+  RUBYLIB=path/to/this/ruby/my_lib
   ```
 
 2. 依存するgemをインストール(crawlers/crawlers.gemspecを参照)
