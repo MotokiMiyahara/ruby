@@ -12,6 +12,7 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 1. 下記のファイル内容をファイルに保存する。
 
 ```sample_dsl.txt
+---[sample_dsl.txt]---
 # vim:set fileencoding=utf-8 ts=2 sw=2 sts=2 et:
 
 # #: コメント
@@ -47,18 +48,22 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 2. 依存するgemをインストール(crawlers/crawlers.gemspecを参照)
 
 3. 画像保存ディレクトリをプログラムに設定
-         # vim:set fileencoding=utf-8:
 
-         require 'pathname'
+```
+# vim:set fileencoding=utf-8:
 
-         # monkey patching
-         class Crawlers::Config
-           class << self
-             def app_dir
-               return Pathname('/home/xxxx/generated_data/crawlers')
-             end
-           end
-         end
+require 'pathname'
+
+# monkey patching
+class Crawlers::Config
+ class << self
+   def app_dir
+     return Pathname('/home/xxxx/generated_data/crawlers')
+   end
+ end
+end
+```
+
     
 4. 画像保存ディレクトリを作成
 `ruby crawlers/bin/installer_crawlers.rb`
