@@ -53,7 +53,7 @@ Firefox(各サイトへのログイン情報をFirefoxのCookieから取得す�
 
 3. 画像保存ディレクトリをプログラムに設定
   ```
-  ---[~/.mtk/crawlers/config.rb ]---
+  ---[~/.mtk/crawlers/config.rb]---
   # vim:set fileencoding=utf-8:
 
   require 'pathname'
