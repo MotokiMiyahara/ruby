@@ -1,29 +1,23 @@
-# Crawlers
+Crawlers
+====
 
-TODO: Write a gem description
+Overview
+WEB上の画像投稿サイトから、画像を自動収集します。
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'crawlers'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install crawlers
 
 ## Usage
+1.下記のファイル内容をファイルに保存する。
+---[sample_dsl.txt]---
+    `
+    ddd
+    `
 
-TODO: Write usage instructions here
+## Install
 
-## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/crawlers/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+## Licence
+未定義
+
+## Author
+[MotokiMiyahara](https://github.com/MotokiMiyahara/)
+

@@ -35,19 +35,12 @@ module Pixiv
     include Crawlers::Util
 
     VERBOSE = false
-    #VERBOSE = true
     THREAD_COUNT_GET_IMAGE_URLS = 3
     THREAD_COUNT_DOWNLOAD_IMAGES = 3
 
-    #@pool_crawl    = Mtk::Concurrent::HalfPool.new(max_worker_count: 1, priority: 1)
-    #@pool_child    = Mtk::Concurrent::HalfPool.new(max_worker_count: 3, priority: 2)
-    #@pool_download = Mtk::Concurrent::HalfPool.new(max_worker_count: 3, priority: 3)
     class << self
       attr_reader :pool_crawl, :pool_child, :pool_download
       def join
-        #pool_crawl.join
-        # pool_child.join
-        #  pool_download.join
       end
     end
     
@@ -94,17 +87,6 @@ module Pixiv
 
 
     def crawl
-      #self.class.pool_crawl.push_task do
-      #Parallel.each do
-      #  do_crawl
-      #end
-
-      do_crawl
-    end
-
-
-    private
-    def do_crawl
       (@min_page .. @max_page).each do |page|
         crawl_index(page)
       end
@@ -114,6 +96,8 @@ module Pixiv
       log e.message
     end
 
+
+    private
     def ident_message
       return "keyword='#{@keyword}'"
     end
@@ -135,6 +119,7 @@ module Pixiv
       # ネットワーク接続無しでダウンロード済みのファイルを取り除く
       #existing_child_uris, new_child_uris = child_uris.partition{|uri| @search_file_finder.find_by_uri(uri)} 
       new_child_uris = child_uris.reject{|uri| @search_file_finder.find_by_uri(uri)} 
+
       images = fetch_remote_images(base_uri, new_child_uris)
 
       # 実際に接続した結果を利用してダウンロード済みのファイルを取り除く
@@ -174,18 +159,6 @@ module Pixiv
       return remote_images
     end
 
-    #def get_image_uris(base_uri, anchors)
-    #  image_uris = Parallel.map(anchors, in_threads: THREAD_COUNT_GET_IMAGE_URLS) {|anchor|
-    #    child_uri = join_uri(base_uri, anchor[:href])
-    #    unless child_uri =~ /illust_id=\d+/
-    #      log "skip because illust_id not found: page=#{child_uri} keyword=#{@keyword}"
-    #      next
-    #    end
-    #    crawl_child(child_uri, base_uri)
-    #  }.flatten
-    #  return image_uris
-    #end
-
     def crawl_child(*args)
       image_urls = retry_fetch do
         do_crawl_child(*args)
@@ -212,8 +185,8 @@ module Pixiv
       picture.illust_id = base_uri.match(/illust_id=(\d+)/)[1]
       picture.tags = scan_tags(doc).join(" ")
       picture.score_count = (doc.at_css('dd.score-count').text.strip =~ /\d+/) ? $&.to_i : 0
+      
       # 一枚絵
-      #big_image = doc.at_css(%q{div.works_display img.big})
       big_image = doc.at_css(%q{img.original-image})
       if big_image
         image_uri = join_uri(base_uri, big_image['data-src'])
@@ -221,19 +194,14 @@ module Pixiv
       end
 
       # 漫画
-      #manga_anchor = doc.at_css(%q{div.works_display a.multiple,a.manga})
       manga_anchor = doc.at_css(%q{div.works_display a.multiple,a.manga,a._work})
       if !manga_anchor && doc.at_css(%q{div.works_display .multiple})
         manga_anchor = doc.at_css(%q{div.works_display a[target="_blank"]})
       end
       if manga_anchor
         manga_uri = join_uri(base_uri, manga_anchor[:href])
-        #raise "bad manga uri: #{manga_uri}" unless manga_uri =~ /[?&]mode=manga(?:$|&)/
-        #return crawl_manga(manga_uri, base_uri, picture)
-        
         return crawl_works(manga_uri, base_uri, picture)
       end
-
 
       raise "Unexpected data-type. uri=#{base_uri}"
     end
@@ -317,7 +285,7 @@ end
 def crawl
   # 巡回設定
   keywords = <<-EOS.split("\n").map(&:strip).reject(&:empty?)
-    極上の貧乳
+    ドラゴンボール
   EOS
 
   keywords.each do |keyword|

@@ -56,7 +56,6 @@ module Pixiv
             # newsフォルダにリンクを作成
             news_file = calc_news_image_pathname(uri)
             make_link_quietly(@regular_file, news_file)
-            #FileUtils.link(file, NEWS_DIR) if @news_save && !NEWS_DIR.join(file.basename).exist?
           end
         end
 
