@@ -78,14 +78,14 @@ module Pixiv
     end
 
 
-    def make_dest_dir(keyword, parent_dir, is_r18)
+    def make_dest_dir(keyword, parent_dir, is_r18, noop)
       parent_dir = "" unless parent_dir
       parent_dir = parent_dir.split('/').map{|s| fix_basename(s)}.join('/')
 
       dir_prefix = is_r18 ? "r18_" : ""
       dest_dir = PIXIV_DIR.join(parent_dir, fix_basename("%s%s_%s" % [dir_prefix, keyword, @user_name]))
 
-      dest_dir.mkpath unless dest_dir.exist?
+      dest_dir.mkpath unless noop || dest_dir.exist?
       return dest_dir
     end
 
