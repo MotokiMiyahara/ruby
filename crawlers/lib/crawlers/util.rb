@@ -67,11 +67,12 @@ end
 
 module Crawlers::Util::Helpers::Files
   # ファイル名に使えない文字を取り除く
-  def fix_basename basename
+  def fix_basename(basename)
     result = basename.dup
     result.gsub!(%r{[\\/:*?"<>|!]}, '')
     result.gsub!(/\s|　/, '_')
     result.gsub!(/\.$/, '')
+    raise "Can't make safe basename for '#{basename}'" if result.empty?
     return result
   end
 
