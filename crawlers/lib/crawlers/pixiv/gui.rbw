@@ -97,7 +97,8 @@ class PixivGui
     pixiv_data = [] << search_data << user_data
     #pixiv_data.map!{|data| data.sort_by!{|path| item_dir(path).mtime}.reverse!}
 
-    yandere_keyword = %w{news pussy nipples}
+    #yandere_keyword = %w{news pussy nipples}
+    yandere_keyword = []
     yandere_data = yandere_keyword.map{|word| "@yandere:" << word}
 
     #keep_data = keep_dir.children(true).select(&:directory?)
