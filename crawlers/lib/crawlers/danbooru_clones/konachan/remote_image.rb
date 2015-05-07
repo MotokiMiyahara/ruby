@@ -19,9 +19,10 @@ module Crawlers::DanbooruClones::Konachan
     end
 
     def calc_relative_save_dir(id, uri)
-      reg = %r{/(image/[a-f0-9/]+/)Konachan\.com[-_%a-z0-9]+.[a-z]+}
+      #reg = %r{/(image/[a-f0-9/]+/)Konachan\.com[-_%a-z0-9]+.[a-z]+}
+      reg = %r{/(image/[a-f0-9/]+/)Konachan\.com[-._%a-zA-Z0-9]+\.[a-z]+}
       mdata = uri.path.match(reg)
-      raise 'not match' unless mdata
+      raise "not match: uri=#{uri}" unless mdata
 
       sub_dir = mdata.to_a[1]
       return Pathname(uri.host).join(sub_dir).cleanpath
