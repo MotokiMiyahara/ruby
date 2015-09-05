@@ -3,8 +3,9 @@
 require'fileutils'
 require'pp'
 
-require'my/my'
-require'my/config'
+#require'my/my'
+#require'my/config'
+require_relative '../config'
 
 module Moeren
   module Config

@@ -1,7 +1,27 @@
-require "bundler/gem_tasks"
-require "rspec/core/rake_task"
+#require "bundler/gem_tasks"
+#require "rspec/core/rake_task"
+#
+#RSpec::Core::RakeTask.new(:spec)
+#
+#task :default => :spec
 
-RSpec::Core::RakeTask.new(:spec)
+require 'active_record'
+require 'yaml'
+require 'erb'
+require 'logger'
+require 'pp'
+require_relative 'lib/crawlers/config'
 
-task :default => :spec
+task :default => :migrate
 
+desc "Migrate database"
+task :migrate => :environment do
+  ActiveRecord::Migrator.migrate('db/migrate', ENV["VERSION"] ? ENV["VERSION"].to_i : nil )
+end
+
+task :environment do
+  env = ENV['ENV'] || 'development'
+  dbconfig = YAML.load_file(Crawlers::Config.database_yml)
+  ActiveRecord::Base.establish_connection(dbconfig[env])
+  ActiveRecord::Base.logger = Logger.new('db/database.log')
+end

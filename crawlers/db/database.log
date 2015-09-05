@@ -1,0 +1,80 @@
+# Logfile created on 2015-09-05 21:36:41 +0900 by logger.rb/47272
+D, [2015-09-05T21:36:42.392663 #6943] DEBUG -- :   [1m[36m (269.8ms)[0m  [1mCREATE TABLE `schema_migrations` (`version` varchar(255) NOT NULL) ENGINE=InnoDB[0m
+D, [2015-09-05T21:36:42.667935 #6943] DEBUG -- :   [1m[35m (232.3ms)[0m  CREATE UNIQUE INDEX `unique_schema_migrations`  ON `schema_migrations` (`version`) 
+D, [2015-09-05T21:36:42.679539 #6943] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Load (9.9ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+I, [2015-09-05T21:36:42.899869 #6943]  INFO -- : Migrating to CreateKonachanImages (20140910121703)
+D, [2015-09-05T21:36:42.978215 #6943] DEBUG -- :   [1m[35m (74.5ms)[0m  CREATE TABLE `konachan_images` (`id` int(11) auto_increment PRIMARY KEY, `o_id` int(11) NOT NULL, `file_url` text, `tags` text, `rating` varchar(255), `md5` varchar(255), `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB
+D, [2015-09-05T21:36:42.982357 #6943] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:36:43.057517 #6943] DEBUG -- :   [1m[35mSQL (43.9ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140910121703')
+D, [2015-09-05T21:36:43.064352 #6943] DEBUG -- :   [1m[36m (6.3ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:36:43.064551 #6943]  INFO -- : Migrating to AddIndexOidToKonachanImages (20140910122314)
+D, [2015-09-05T21:36:43.177542 #6943] DEBUG -- :   [1m[35m (77.8ms)[0m  CREATE UNIQUE INDEX `index_konachan_images_on_o_id`  ON `konachan_images` (`o_id`) 
+D, [2015-09-05T21:36:43.178433 #6943] DEBUG -- :   [1m[36m (0.3ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:36:43.180966 #6943] DEBUG -- :   [1m[35mSQL (1.9ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140910122314')
+D, [2015-09-05T21:36:43.249904 #6943] DEBUG -- :   [1m[36m (68.6ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:36:43.250064 #6943]  INFO -- : Migrating to AddSavePathToKonachanImages (20140910140904)
+D, [2015-09-05T21:36:43.475085 #6943] DEBUG -- :   [1m[35m (224.1ms)[0m  ALTER TABLE `konachan_images` ADD `save_path` text
+D, [2015-09-05T21:36:43.475757 #6943] DEBUG -- :   [1m[36m (0.2ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:36:43.478938 #6943] DEBUG -- :   [1m[35mSQL (2.6ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140910140904')
+D, [2015-09-05T21:36:43.484777 #6943] DEBUG -- :   [1m[36m (5.5ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:36:43.484913 #6943]  INFO -- : Migrating to AddSourceToKonachanImages (20140911132951)
+D, [2015-09-05T21:36:43.526590 #6943] DEBUG -- :   [1m[35m (40.7ms)[0m  ALTER TABLE `konachan_images` ADD `source` text
+D, [2015-09-05T21:36:43.527291 #6943] DEBUG -- :   [1m[36m (0.2ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:36:43.529768 #6943] DEBUG -- :   [1m[35mSQL (1.8ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140911132951')
+D, [2015-09-05T21:36:43.567980 #6943] DEBUG -- :   [1m[36m (37.9ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:36:43.568119 #6943]  INFO -- : Migrating to CreateGelbooruImages (20140913010731)
+D, [2015-09-05T21:36:43.583641 #6943] DEBUG -- :   [1m[35m (14.1ms)[0m  CREATE TABLE `gelbooru_images` (`id` int(11) auto_increment PRIMARY KEY, `o_id` int(11) NOT NULL, `file_url` text, `tags` text, `rating` varchar(255), `md5` varchar(255), `save_path` text, `source` text, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB
+D, [2015-09-05T21:36:43.705147 #6943] DEBUG -- :   [1m[36m (80.6ms)[0m  [1mCREATE UNIQUE INDEX `index_gelbooru_images_on_o_id`  ON `gelbooru_images` (`o_id`) [0m
+D, [2015-09-05T21:36:43.705983 #6943] DEBUG -- :   [1m[35m (0.3ms)[0m  BEGIN
+D, [2015-09-05T21:36:43.744096 #6943] DEBUG -- :   [1m[36mSQL (37.4ms)[0m  [1mINSERT INTO `schema_migrations` (`version`) VALUES ('20140913010731')[0m
+D, [2015-09-05T21:36:43.748900 #6943] DEBUG -- :   [1m[35m (4.5ms)[0m  COMMIT
+D, [2015-09-05T21:37:04.196526 #7168] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+D, [2015-09-05T21:45:17.573152 #11902] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+D, [2015-09-05T21:45:34.054346 #12104] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+D, [2015-09-05T21:45:34.075141 #12104] DEBUG -- :   [1m[35mActiveRecord::SchemaMigration Load (0.2ms)[0m  SELECT `schema_migrations`.* FROM `schema_migrations`
+D, [2015-09-05T21:45:34.082688 #12104] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+I, [2015-09-05T21:45:34.083130 #12104]  INFO -- : Migrating to CreateGelbooruImages (20140913010731)
+D, [2015-09-05T21:45:34.187537 #12104] DEBUG -- :   [1m[35m (65.2ms)[0m  DROP INDEX `index_gelbooru_images_on_o_id` ON `gelbooru_images`
+D, [2015-09-05T21:45:34.210743 #12104] DEBUG -- :   [1m[36m (22.8ms)[0m  [1mDROP TABLE `gelbooru_images`[0m
+D, [2015-09-05T21:45:34.242117 #12104] DEBUG -- :   [1m[35mSQL (17.0ms)[0m  DELETE FROM `schema_migrations` WHERE `schema_migrations`.`version` = '20140913010731'
+I, [2015-09-05T21:45:34.242361 #12104]  INFO -- : Migrating to AddSourceToKonachanImages (20140911132951)
+D, [2015-09-05T21:45:34.308885 #12104] DEBUG -- :   [1m[36m (65.2ms)[0m  [1mALTER TABLE `konachan_images` DROP `source`[0m
+D, [2015-09-05T21:45:34.370783 #12104] DEBUG -- :   [1m[35mSQL (60.9ms)[0m  DELETE FROM `schema_migrations` WHERE `schema_migrations`.`version` = '20140911132951'
+I, [2015-09-05T21:45:34.370958 #12104]  INFO -- : Migrating to AddSavePathToKonachanImages (20140910140904)
+D, [2015-09-05T21:45:34.460237 #12104] DEBUG -- :   [1m[36m (88.5ms)[0m  [1mALTER TABLE `konachan_images` DROP `save_path`[0m
+D, [2015-09-05T21:45:34.465549 #12104] DEBUG -- :   [1m[35mSQL (4.5ms)[0m  DELETE FROM `schema_migrations` WHERE `schema_migrations`.`version` = '20140910140904'
+I, [2015-09-05T21:45:34.465699 #12104]  INFO -- : Migrating to AddIndexOidToKonachanImages (20140910122314)
+D, [2015-09-05T21:45:34.474188 #12104] DEBUG -- :   [1m[36m (6.7ms)[0m  [1mDROP INDEX `index_konachan_images_on_o_id` ON `konachan_images`[0m
+D, [2015-09-05T21:45:34.478141 #12104] DEBUG -- :   [1m[35mSQL (3.1ms)[0m  DELETE FROM `schema_migrations` WHERE `schema_migrations`.`version` = '20140910122314'
+I, [2015-09-05T21:45:34.478561 #12104]  INFO -- : Migrating to CreateKonachanImages (20140910121703)
+D, [2015-09-05T21:45:34.483788 #12104] DEBUG -- :   [1m[36m (3.9ms)[0m  [1mDROP TABLE `konachan_images`[0m
+D, [2015-09-05T21:45:34.488543 #12104] DEBUG -- :   [1m[35mSQL (3.5ms)[0m  DELETE FROM `schema_migrations` WHERE `schema_migrations`.`version` = '20140910121703'
+D, [2015-09-05T21:47:53.054024 #13699] DEBUG -- :   [1m[36m (161.5ms)[0m  [1mCREATE TABLE `schema_migrations` (`version` varchar(255) NOT NULL) ENGINE=InnoDB[0m
+D, [2015-09-05T21:47:53.105981 #13699] DEBUG -- :   [1m[35m (50.5ms)[0m  CREATE UNIQUE INDEX `unique_schema_migrations`  ON `schema_migrations` (`version`) 
+D, [2015-09-05T21:47:53.107390 #13699] DEBUG -- :   [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+I, [2015-09-05T21:47:53.114204 #13699]  INFO -- : Migrating to CreateKonachanImages (20140910121703)
+D, [2015-09-05T21:47:53.142900 #13699] DEBUG -- :   [1m[35m (25.5ms)[0m  CREATE TABLE `konachan_images` (`id` int(11) auto_increment PRIMARY KEY, `o_id` int(11) NOT NULL, `file_url` text, `tags` text, `rating` varchar(255), `md5` varchar(255), `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB
+D, [2015-09-05T21:47:53.158862 #13699] DEBUG -- :   [1m[36m (8.9ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:47:53.170651 #13699] DEBUG -- :   [1m[35mSQL (3.7ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140910121703')
+D, [2015-09-05T21:47:53.180039 #13699] DEBUG -- :   [1m[36m (8.8ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:47:53.180212 #13699]  INFO -- : Migrating to AddIndexOidToKonachanImages (20140910122314)
+D, [2015-09-05T21:47:53.223936 #13699] DEBUG -- :   [1m[35m (41.4ms)[0m  CREATE UNIQUE INDEX `index_konachan_images_on_o_id`  ON `konachan_images` (`o_id`) 
+D, [2015-09-05T21:47:53.224715 #13699] DEBUG -- :   [1m[36m (0.1ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:47:53.225616 #13699] DEBUG -- :   [1m[35mSQL (0.2ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140910122314')
+D, [2015-09-05T21:47:53.228978 #13699] DEBUG -- :   [1m[36m (3.0ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:47:53.229126 #13699]  INFO -- : Migrating to AddSavePathToKonachanImages (20140910140904)
+D, [2015-09-05T21:47:53.262557 #13699] DEBUG -- :   [1m[35m (32.3ms)[0m  ALTER TABLE `konachan_images` ADD `save_path` text
+D, [2015-09-05T21:47:53.263369 #13699] DEBUG -- :   [1m[36m (0.2ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:47:53.264313 #13699] DEBUG -- :   [1m[35mSQL (0.3ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140910140904')
+D, [2015-09-05T21:47:53.273018 #13699] DEBUG -- :   [1m[36m (8.4ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:47:53.273164 #13699]  INFO -- : Migrating to AddSourceToKonachanImages (20140911132951)
+D, [2015-09-05T21:47:53.295540 #13699] DEBUG -- :   [1m[35m (21.5ms)[0m  ALTER TABLE `konachan_images` ADD `source` text
+D, [2015-09-05T21:47:53.296215 #13699] DEBUG -- :   [1m[36m (0.2ms)[0m  [1mBEGIN[0m
+D, [2015-09-05T21:47:53.296934 #13699] DEBUG -- :   [1m[35mSQL (0.2ms)[0m  INSERT INTO `schema_migrations` (`version`) VALUES ('20140911132951')
+D, [2015-09-05T21:47:53.306252 #13699] DEBUG -- :   [1m[36m (9.0ms)[0m  [1mCOMMIT[0m
+I, [2015-09-05T21:47:53.306420 #13699]  INFO -- : Migrating to CreateGelbooruImages (20140913010731)
+D, [2015-09-05T21:47:53.316519 #13699] DEBUG -- :   [1m[35m (8.6ms)[0m  CREATE TABLE `gelbooru_images` (`id` int(11) auto_increment PRIMARY KEY, `o_id` int(11) NOT NULL, `file_url` text, `tags` text, `rating` varchar(255), `md5` varchar(255), `save_path` text, `source` text, `created_at` datetime, `updated_at` datetime) ENGINE=InnoDB
+D, [2015-09-05T21:47:53.335844 #13699] DEBUG -- :   [1m[36m (18.0ms)[0m  [1mCREATE UNIQUE INDEX `index_gelbooru_images_on_o_id`  ON `gelbooru_images` (`o_id`) [0m
+D, [2015-09-05T21:47:53.338537 #13699] DEBUG -- :   [1m[35m (2.0ms)[0m  BEGIN
+D, [2015-09-05T21:47:53.339435 #13699] DEBUG -- :   [1m[36mSQL (0.2ms)[0m  [1mINSERT INTO `schema_migrations` (`version`) VALUES ('20140913010731')[0m
+D, [2015-09-05T21:47:53.344920 #13699] DEBUG -- :   [1m[35m (5.2ms)[0m  COMMIT
