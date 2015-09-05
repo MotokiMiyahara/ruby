@@ -25,6 +25,7 @@ mkmf.log
 # Vi backup
 *~
 *.swp
+*.swo
 
 #ctags
 tags

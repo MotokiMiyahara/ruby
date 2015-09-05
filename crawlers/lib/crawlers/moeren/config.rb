@@ -8,10 +8,8 @@ require'my/config'
 
 module Moeren
   module Config
-
     extend self
-
-    DEST_DIR = My::CONFIG.dest_dir.join('crawler/moeren')
+    DEST_DIR        = Crawlers::Config::app_dir + 'moeren'
     NEWS_ROTATE_DIR = DEST_DIR.join("news")
     NEWS_DIR        = NEWS_ROTATE_DIR + "news"
     
