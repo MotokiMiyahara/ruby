@@ -34,3 +34,6 @@ tags
 *.sz7
 nodup.log
 
+# -----
+# crawlers
+.flock
