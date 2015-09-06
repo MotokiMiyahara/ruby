@@ -105,7 +105,8 @@ module Pixiv
       end
 
       def make_link_quietly(old, new)
-        FileUtils.ln_sf(old, new, verbose: VERBOSE)
+        #FileUtils.ln_sf(old, new, verbose: VERBOSE)
+        Crawlers::Util::Helpers::Etc.make_link_quietly(old, new, verbose: @config.verbose)
       end
     end
   end

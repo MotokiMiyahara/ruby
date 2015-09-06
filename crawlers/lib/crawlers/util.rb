@@ -160,7 +160,6 @@ module Crawlers::Util::Helpers::Files
       log "sleep #{sleep_sec} sec"
       sleep(sleep_sec)
   end
-
 end
 
 module Crawlers::Util::Helpers::Tk
@@ -173,5 +172,22 @@ module Crawlers::Util::Helpers::Tk
       message: message)
 
     return (button == 'ok')
+  end
+end
+
+module Crawlers::Util::Helpers::Etc
+  class << self
+    def make_link_quietly(old, new, verbose: nil)
+      type = Crawlers::Config.news_type 
+      case type
+      when :hard_link
+        FileUtils.link(old, new, force: true, verbose: verbose)
+
+      when :sym_link
+        FileUtils.ln_sf(old, new, verbose: verbose)
+      else
+        raise "wrong type: #{type}"
+      end
+    end
   end
 end

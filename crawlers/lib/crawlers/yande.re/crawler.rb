@@ -139,7 +139,9 @@ puts uri
         f.write binary
       end
 
-      FileUtils.link(dest_file, NEWS_DIR) if @news_save && !NEWS_DIR.join(dest_file.basename).exist?
+      if @news_save && !NEWS_DIR.join(dest_file.basename).exist?
+        Crawlers::Util::Helpers::Etc.make_link_quietly(dest_file, NEWS_DIR)
+      end
     end
 
 

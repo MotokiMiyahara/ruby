@@ -56,7 +56,9 @@ module Moeren
             end
 
             # newsフォルダへコピー
-            FileUtils.link(image_file, Moeren::Config::NEWS_DIR) unless Moeren::Config::NEWS_DIR.join(image_file.basename).exist?
+            unless Moeren::Config::NEWS_DIR.join(image_file.basename).exist?
+              Crawlers::Util::Helpers::Etc.make_link_quietly(image_file, Moeren::Config::NEWS_DIR)
+            end
 
           rescue => e
             puts e

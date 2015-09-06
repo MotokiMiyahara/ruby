@@ -36,6 +36,11 @@ module Crawlers
         USER_CONFIG_DIR + ('database.yml')
       end
 
+      # @return :hard_link or :sym_link
+      def news_type
+        :hard_link
+        #:sym_link
+      end
 
       def make_dirs
         save_dir.mkdir unless save_dir.exist?

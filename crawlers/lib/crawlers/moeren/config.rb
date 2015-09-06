@@ -6,6 +6,7 @@ require'pp'
 #require'my/my'
 #require'my/config'
 require_relative '../config'
+require_relative '../util'
 
 module Moeren
   module Config

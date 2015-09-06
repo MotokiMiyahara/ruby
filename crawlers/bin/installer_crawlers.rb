@@ -2,6 +2,7 @@
 # vim:set fileencoding=utf-8:
 # データ保存用のディレクトリを作るだけ
 
+require 'optparse'
 require_relative '../lib/crawlers/config'
 require_relative '../lib/crawlers/pixiv/constants'
 require_relative '../lib/crawlers/moeren/config'
@@ -11,6 +12,14 @@ require_relative '../lib/crawlers/danbooru_clones/konachan/config'
 require_relative '../lib/crawlers/danbooru_clones/gelbooru/config'
 
 def main
+  opts = {}
+  parser = OptionParser.new
+  parser.on('--noop', 'no oparation'){|v| opts[:noop] = true}
+  parser.parse!(ARGV)
+
+  noop = opts[:noop]
+
+  puts noop
 
   puts "You want to make dir? [Y/n]  (#{Crawlers::Config.app_dir})"
   reply = gets.chomp
@@ -45,7 +54,8 @@ def main
   ]
 
   dirs.each do |dir|
-    dir.mkpath
+    #dir.mkpath
+    FileUtils.mkpath(dir, noop: noop, verbose: noop)
   end
 
   puts 'finished.'
