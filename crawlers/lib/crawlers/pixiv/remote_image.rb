@@ -71,7 +71,7 @@ module Pixiv
 
       def fetch_image(uri, referer, file)
         log uri 
-        binary = retry_fetch(message: uri) {
+        binary = retry_fetch_with_timelag(message: uri) {
           @firefox.get_binary uri, 'Referer' => referer
         }
         write_binary_quietly(file, binary)
@@ -106,7 +106,7 @@ module Pixiv
 
       def make_link_quietly(old, new)
         #FileUtils.ln_sf(old, new, verbose: VERBOSE)
-        Crawlers::Util::Helpers::Etc.make_link_quietly(old, new, verbose: @config.verbose)
+        Crawlers::Util::Helpers::Etc.make_link_quietly(old, new, verbose: VERBOSE)
       end
     end
   end

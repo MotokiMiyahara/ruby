@@ -41,19 +41,19 @@ module Pixiv
       )
 
       def crawl_users
-        Pixiv::PictureDb.open do |db|
-          db = nil # not use mysql
+        #Pixiv::PictureDb.open do |db|
+        #  db = nil # not use mysql
 
           
           UserData.users do |user|
-            crawler = create_user_crawler(user, db)
+            crawler = create_user_crawler(user)
             crawler.crawl
           end
-          UserCrawler.join
-        end
+          #  UserCrawler.join
+          #end
       end
 
-      def create_user_crawler(user, db)
+      def create_user_crawler(user)
         crawler = new(
           user.id,      #keyword,
           min_page: 1,
@@ -63,7 +63,7 @@ module Pixiv
           news_only: true,
           #news_save: false,
           news_save: true,
-          db: db,
+          #db: db,
           parent_dir: 'user',
 
           user_name: user.name

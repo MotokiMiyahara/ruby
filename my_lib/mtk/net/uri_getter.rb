@@ -64,11 +64,13 @@ module Mtk
             'User-Agent' => USER_AGENT_FIREFOX, 
             'Accept-Language' => 'ja,en-us;q=0.7,en;q=0.3',
             :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE,
-            'Accept-Encoding' => 'gzip, deflate',
+            #'Accept-Encoding' => 'gzip, deflate',
           }
           opts = args[-1].is_a?(Hash) ? args.pop : {}
           options.merge! opts
 
+          ########
+          options. delete('Accept-Encoding')
 
           #pp opts
           if block.nil?
@@ -81,24 +83,28 @@ module Mtk
           end
         end
         
-        def wrap_content_decoder meta_io
-          content_encoding = meta_io.meta['content-encoding']
-          case content_encoding
-          when /gzip/i
-            decoder = Zlib::GzipReader.new(meta_io,  external_encoding: 'UTF-8')
-          when /deflate/i
-            decoder = Zlib::Inflate.new
-            decoder << meta_io.read
-          else
-            decoder = nil
-          end
+        #def wrap_content_decoder meta_io
+        #  content_encoding = meta_io.meta['content-encoding']
+        #  case content_encoding
+        #  when /gzip/i
+        #    decoder = Zlib::GzipReader.new(meta_io,  external_encoding: 'UTF-8')
+        #  when /deflate/i
+        #    decoder = Zlib::Inflate.new
+        #    decoder << meta_io.read
+        #  else
+        #    decoder = nil
+        #  end
 
-          if decoder
-            meta_io.meta.delete('content-encoding')
-            return MetaWrapper.new(decoder, meta_io)
-          else
-            return meta_io
-          end
+        #  if decoder
+        #    meta_io.meta.delete('content-encoding')
+        #    return MetaWrapper.new(decoder, meta_io)
+        #  else
+        #    return meta_io
+        #  end
+        #end
+        
+        def wrap_content_decoder meta_io
+          return meta_io
         end
 
         # htmlのメタタグからcharsetを判定し、強制的に変換する

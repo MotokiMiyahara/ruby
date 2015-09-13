@@ -124,10 +124,14 @@ module Pixiv
       #log "index: page=#{page} keyword=#{@keyword}"
       log "index: page=#{page} #{ident_message}"
       base_uri = index_uri(page)
+
+      log(base_uri)
+
       doc = get_document(base_uri)
 
       # もう画像がない
-      if doc.at_css('div._no-item')
+      #if doc.at_css('div._no-item')
+      if doc.at_css('section.column-search-result div._no-item')
         raise OutOfIndexError, "Out of index page: page=#{page} keyword=#{@keyword}"
       end
 

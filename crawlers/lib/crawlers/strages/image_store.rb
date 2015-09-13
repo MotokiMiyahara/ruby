@@ -24,7 +24,7 @@ class Crawlers::ImageStore
   end
 
   def store_image(image_path)
-    dir_path = image_path.to_pathname.dirname
+    dir_path = Pathname(image_path).dirname
     key = clean_key(dir_path)
     value = clean_value(image_path)
     @db.transaction do
@@ -40,7 +40,7 @@ class Crawlers::ImageStore
   end
 
   def clean_path(path)
-    return path.to_s.encode('UTF-8').gsub('\\', '/').to_pathname.cleanpath
+    return Pathname(path.to_s.encode('UTF-8').gsub('\\', '/')).cleanpath
   end
   alias clean_key clean_path
   alias clean_value clean_path

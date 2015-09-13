@@ -60,7 +60,8 @@ class Scripts::Helper
 end
 
 class Scripts::Invoker
-  APP_BROWSER = "C:/Program Files/Mozilla Firefox/firefox.exe"
+  #APP_BROWSER = "C:/Program Files/Mozilla Firefox/firefox.exe"
+  APP_BROWSER = "C:/Program Files (x86)/Mozilla Firefox/firefox.exe"
 
   class << self
     include Crawlers::Util
