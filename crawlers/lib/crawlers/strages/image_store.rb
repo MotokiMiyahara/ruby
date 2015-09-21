@@ -19,7 +19,14 @@ class Crawlers::ImageStore
   def [](key)
     key = clean_key(key)
     @db.transaction do
-      return @db[key]
+      case Mtk::Environment::os
+      when :linux
+        return @db[key]
+
+      when :win
+        return Pathname(@db[key].to_s.gsub('/', '\\'))
+
+      end
     end
   end
 

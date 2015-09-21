@@ -19,12 +19,14 @@ module Crawlers::DanbooruClones::Gelbooru
     end
 
     def calc_relative_save_dir(id, uri)
-      reg = %r{/([a-f0-9/]+)/[a-f0-9]+\.[a-z]+}
+      reg = %r{^/(images/[a-f0-9/]+)/[a-f0-9]+\.[a-z]+}
       mdata = uri.path.match(reg)
       raise 'not match' unless mdata
 
       sub_dir = mdata.to_a[1]
-      return Pathname(uri.host).join(sub_dir).cleanpath
+      #result = Pathname(uri.host).join(sub_dir).cleanpath
+      result = Pathname(sub_dir).cleanpath
+      return result
     end
   end
 end
