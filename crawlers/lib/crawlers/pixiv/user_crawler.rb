@@ -117,7 +117,8 @@ class Pixiv::UserCrawler::UserData
     public
     def users(&block)
       raise unless block
-      CSV.open(SAVE_FILE, "r:UTF-8") do |csv|
+      #CSV.open(SAVE_FILE, "r:UTF-8", row_sep: '\r\n') do |csv|
+      CSV.open(SAVE_FILE, "r:UTF-8", row_sep: "\n") do |csv|
         csv.flock(File::LOCK_SH)
         csv.reverse_each do |row|
           # コメント行を飛ばす
@@ -168,7 +169,7 @@ class Pixiv::UserCrawler::UserData
     def add_user_list(ids)
 
       existing_ids = nil
-      CSV.open(SAVE_FILE, "r:UTF-8", headers: [:id, :name]) do |csv|
+      CSV.open(SAVE_FILE, "r:UTF-8", row_sep: "\n", headers: [:id, :name]) do |csv|
         csv.flock(File::LOCK_SH)
         table = csv.readlines
         existing_ids = table[:id]
@@ -177,7 +178,7 @@ class Pixiv::UserCrawler::UserData
       # すでに登録されているidを取り除く
       new_ids = ids - existing_ids
 
-      CSV.open(SAVE_FILE, "a:UTF-8") do |csv|
+      CSV.open(SAVE_FILE, "a:UTF-8", row_sep: "\n") do |csv|
         csv.flock(File::LOCK_EX)
 
         new_ids.each do |id|
