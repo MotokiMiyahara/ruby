@@ -34,8 +34,11 @@ if $0 == __FILE__
       def main
         #script_header(:filename)
 
+
+        pp 'aaaaaaaaaa'
         opts = parse_opt!
         dest_dir = opts[:dest_dir] || Crawlers::Config.keep_dir
+        pp dest_dir
 
         if ARGV.size < 1
           puts 'usage: ruby copy_and_touch.rb [opts] {filename}'
