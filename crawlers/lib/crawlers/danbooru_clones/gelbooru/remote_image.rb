@@ -24,8 +24,8 @@ module Crawlers::DanbooruClones::Gelbooru
       raise 'not match' unless mdata
 
       sub_dir = mdata.to_a[1]
-      puts '-----------------------------------------'
-      pp sub_dir
+      #puts '-----------------------------------------'
+      #pp sub_dir
       result = Pathname(sub_dir).cleanpath
       return result
     end
