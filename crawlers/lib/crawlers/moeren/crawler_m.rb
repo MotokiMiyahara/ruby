@@ -36,8 +36,8 @@ module Moeren
     def do_crawl(base_uri)
       begin
         html = UriGetter.get_html_as_utf8(base_uri)
-      rescue SocketError => e
-        puts "Not found: " + base_uri + " (#{e})"
+      rescue SocketError, OpenURI::HTTPError => e
+        puts "Not found: #{base_uri}(#{e})"
         return
       end
 
