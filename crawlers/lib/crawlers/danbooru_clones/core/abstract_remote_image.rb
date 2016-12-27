@@ -61,11 +61,13 @@ module Crawlers::DanbooruClones::Core
         :created_at,
         :updated_at,
         :save_path,
+        :hash,
       ]
 
       h_model = {}
       attrs = model_class.attribute_names.map(&:to_sym) - renames.flatten - excepts
       attrs.each do |a|
+        pp attrs
         h_model[a] = xml_doc[a]
       end
 
