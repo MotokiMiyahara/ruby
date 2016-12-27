@@ -103,6 +103,7 @@ module Crawlers::Util::Helpers::Files
     Timeout::Error,
     EOFError,
     Errno::ECONNREFUSED,
+    Errno::ETIMEDOUT,
     Crawlers::DataSourceError,
   ].freeze
 

@@ -55,7 +55,7 @@ module Hentai
 
       log("title: #{title}")
 
-      @dest_dir = Config.site_dir + title
+      @dest_dir = Config.site_dir + title.gsub(/[>]/, '_')
       @dest_dir.mkdir unless @dest_dir.exist?
 
       list_pages = fetch_list_pages(uri)
