@@ -1,10 +1,14 @@
 #!/usr/bin/env ruby
 # vim:set fileencoding=utf-8:
 
+require 'active_record'
+
 require 'optparse'
 require_relative '../lib/crawlers/parsers'
 
 if $0 == __FILE__
+  ActiveRecord::Base.connection.close
+
   Thread.abort_on_exception = true
 
   opts = {}
