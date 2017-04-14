@@ -7,6 +7,8 @@ require 'pp'
 require 'nokogiri'
 require "rbconfig"
 
+require 'open_uri_redirections'
+
 require 'mtk/net/uri_getter'
 
 module Mtk
@@ -49,6 +51,7 @@ module Mtk
         uri = URI(uri)
         options = {
           'User-Agent' => @user_agent, 
+          :allow_redirections => :safe,
           #'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           #'Accept-Language'   => 'ja,en-us;q=0.7,en;q=0.3',
           #'Accept-Encoding'   => 'gzip, deflate',

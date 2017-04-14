@@ -195,6 +195,8 @@ module Pixiv
     def do_crawl_child(base_uri, referer)
       doc = get_document(base_uri, 'Referer' => referer)
 
+      #pp base_uri
+
       # 公開レベルなどの制限を受けたときは何もしない
       return [] if doc.at_css('span.error')
 
@@ -206,7 +208,9 @@ module Pixiv
       picture = PictureDb::DummyPicture.new
       picture.illust_id = base_uri.match(/illust_id=(\d+)/)[1]
       picture.tags = scan_tags(doc).join(" ")
-      picture.score_count = (doc.at_css('dd.score-count').text.strip =~ /\d+/) ? $&.to_i : 0
+
+      #picture.score_count = (doc.at_css('dd.score-count').text.strip =~ /\d+/) ? $&.to_i : 0
+      picture.score_count = (doc.at_css('dd.rated-count').text.strip =~ /\d+/) ? $&.to_i : 0
       
       # 一枚絵
       big_image = doc.at_css(%q{img.original-image})

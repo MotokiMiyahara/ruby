@@ -25,7 +25,12 @@ module Crawlers::DanbooruClones::Core
 
       @model = get_model(xml_doc)
       @id = @model.o_id
-      @uri = @model.file_url
+
+      if @model.file_url.to_s.start_with?("//") 
+        @uri = 'http:' + @model.file_url.to_s
+      else
+        @uri = @model.file_url
+      end
 
       @dest_dir = dest_dir
       @news_save = news_save
@@ -67,7 +72,6 @@ module Crawlers::DanbooruClones::Core
       h_model = {}
       attrs = model_class.attribute_names.map(&:to_sym) - renames.flatten - excepts
       attrs.each do |a|
-        pp attrs
         h_model[a] = xml_doc[a]
       end
 
@@ -77,6 +81,7 @@ module Crawlers::DanbooruClones::Core
 
       model = model_class.new(h_model)
       model.save_path = calc_save_path(id, model.file_url).to_s
+      pp model
       raise unless model.save
       return model
     end
