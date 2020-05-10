@@ -52,10 +52,11 @@ module Hentai
       title = title.empty? ? index_page.at('#gn').text.strip : title
       title.gsub!(/^\.\./, '')
       title.gsub!('/', '_')
+      title.gsub!(':', '_')
 
       log("title: #{title}")
 
-      @dest_dir = Config.site_dir + title.gsub(/[>]/, '_')
+      @dest_dir = Config.site_dir + title.gsub(/[>?]/, '_')
       @dest_dir.mkdir unless @dest_dir.exist?
 
       list_pages = fetch_list_pages(uri)

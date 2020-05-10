@@ -18,11 +18,14 @@ class Scripts::ViewInPixiv
     def execute(image)
       basename =  Pathname(image).basename.to_s
       uri = get_uri(basename)
+      puts uri
       invoke_browser(uri)
     end
 
     private
     def get_uri(basename)
+      basename = basename.sub(/^waifu_/, '')
+
       case basename
       #when /^pixiv_(\d+)(?:_big_p\d+)?\.\w+/
       #when /^pixiv_(\d+)(?:_(?:big_)?p\d+)?\.\w+/
@@ -36,7 +39,7 @@ class Scripts::ViewInPixiv
       when /^konachan_(\d+)/
         "http://konachan.com/post/show/#{$1}/"
 
-      when /^yandere_(\d+)/
+      when /^yande\.?re[_\s](\d+)/
         "https://yande.re/post/show/#{$1}/"
 
       #when /^(\d+)(?:_(?:big_)p\d+)?\.\w+/
