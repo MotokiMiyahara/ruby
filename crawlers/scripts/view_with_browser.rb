@@ -24,7 +24,15 @@ class Scripts::ViewInPixiv
 
     private
     def get_uri(basename)
-      basename = basename.sub(/^waifu_/, '')
+      ignore_headers = %w{
+         waifu 
+         kaizou
+         kaiten
+         k 
+      }
+      header_pattern = "^(?:(?:#{ignore_headers.join('|')})_)+"
+
+      basename = basename.sub(/^#{header_pattern}/, '')
 
       case basename
       #when /^pixiv_(\d+)(?:_big_p\d+)?\.\w+/
